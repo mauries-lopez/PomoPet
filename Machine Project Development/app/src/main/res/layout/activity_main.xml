@@ -15,25 +15,26 @@
         <LinearLayout
             android:id="@+id/timer_ll"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="347dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/informationPane_ll"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
+                android:id="@+id/timer_inside_ll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/timer_insidecons_title_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/textView12"
+                        android:id="@+id/pomoPet_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="31dp"
@@ -41,19 +42,70 @@
                         android:text="PomoPet"
                         android:textSize="24sp"
                         android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <LinearLayout
-                    android:layout_width="296dp"
-                    android:layout_height="296dp"
-                    android:gravity="center"
-                    android:orientation="horizontal" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/timer_insidecons_timer_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/timer_inputs_ll"
+                        android:layout_width="0dp"
+                        android:layout_height="202dp"
+                        android:layout_marginStart="39dp"
+                        android:layout_marginEnd="39dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <EditText
+                            android:id="@+id/timer_hrsinput_et"
+                            android:layout_width="wrap_content"
+                            android:layout_height="98dp"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="00h"
+                            android:inputType="number"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/timer_minsinput_et"
+                            android:layout_width="wrap_content"
+                            android:layout_height="98dp"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="00m"
+                            android:inputType="number"
+                            android:textAlignment="center"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/timer_secinput_et"
+                            android:layout_width="wrap_content"
+                            android:layout_height="98dp"
+                            android:layout_weight="1"
+                            android:ems="10"
+                            android:hint="00s"
+                            android:inputType="number"
+                            android:textAlignment="center"
+                            android:textAllCaps="false"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
+                    android:id="@+id/timer_inside_btns_ll"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="81dp"
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="horizontal">
@@ -96,24 +148,24 @@
         <LinearLayout
             android:id="@+id/informationPane_ll"
             android:layout_width="0dp"
-            android:layout_height="310dp"
+            android:layout_height="0dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:paddingTop="25dp"
-            android:paddingBottom="25dp"
             app:layout_constraintBottom_toTopOf="@+id/bottomMenu_ll"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/timer_ll">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <LinearLayout
-                    android:layout_width="337dp"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="39dp"
-                    android:layout_marginEnd="38dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="39dp"
                     android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -171,12 +223,14 @@
         <LinearLayout
             android:id="@+id/bottomMenu_ll"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
             android:orientation="vertical"
             android:paddingTop="25dp"
             android:paddingBottom="25dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
@@ -195,7 +249,7 @@
 
                 <Button
                     android:id="@+id/button3"
-                    android:layout_width="wrap_content"
+                    android:layout_width="161dp"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
