@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">PomoPet</string>
+    <string name="tap_anywhere_to_start">Tap anywhere to start</string>
+    <string name="welcome_to_pomopet">Welcome to PomoPet!</string>
+    <string name="register_description">You\'ll be an owner of your very own pet! \n\n
+        Don\'t worry. They can take care of themselves, but they can\'t seem to grow! \n\n
+        That's where you come in. These pets are hungry for inspiration and energy. \n\n
+        Perhaps you could be the inspiration they need!
+    </string>
+    <string name="signed_by">Signed by:</string>
 </resources>
