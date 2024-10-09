@@ -9,4 +9,5 @@
     </string>
 
     <string name="signed_by">Signed by:</string>
+    <string name="title_activity_view_exercises">ViewExercises</string>
 </resources>
