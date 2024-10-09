@@ -111,7 +111,7 @@
                     android:orientation="horizontal">
 
                     <Button
-                        android:id="@+id/button5"
+                        android:id="@+id/timer_btn_0"
                         android:layout_width="80dp"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="40dp"
@@ -129,7 +129,7 @@
                         android:layout_weight="1" />
 
                     <Button
-                        android:id="@+id/button6"
+                        android:id="@+id/timer_btn_1"
                         android:layout_width="80dp"
                         android:layout_height="match_parent"
                         android:layout_marginRight="40dp"
