@@ -7,8 +7,8 @@
         That is where you come in. These pets are hungry for inspiration and energy. \n\n
         Perhaps you could be the inspiration they need!
     </string>
-
     <string name="signed_by">Signed by:</string>
     <string name="title_activity_view_exercises">ViewExercises</string>
     <string name="tap_to_hatch">Tap anywhere to hatch</string>
+    <string name="semicolon">:</string>
 </resources>
