@@ -24,8 +24,10 @@
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="visible"
-        tools:layout_editor_absoluteX="74dp"
-        tools:layout_editor_absoluteY="96dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/img_egg"
@@ -44,6 +46,7 @@
             app:srcCompat="@drawable/hand_tap_1" />
 
         <TextView
+            android:id="@+id/txt_tap_to_hatch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -52,7 +55,7 @@
             android:text="@string/tap_to_hatch"
             android:textColor="#000000"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
     </LinearLayout>
 
