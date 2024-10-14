@@ -29,31 +29,51 @@
 
         <ImageView
             android:id="@+id/img_egg"
-            android:layout_width="250dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginTop="50dp"
             android:layout_weight="4"
+            android:padding="100dp"
             app:srcCompat="@drawable/evol1_red1" />
 
         <TextView
-            android:id="@+id/txt_egg_name"
+            android:id="@+id/txt_congrats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:gravity="center"
-            android:text="Pet name here"
-            android:textSize="34sp"
+            android:text="@string/congrats"
+            android:textAlignment="center"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/txt_tap_to_cont"
+            android:id="@+id/txt_name_your_pet"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="@string/name_your_pet"
+            android:textAlignment="center"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/edittxt_pet_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Name"
+            android:inputType="text|textCapCharacters"
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/txt_tap_to_cont"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            android:layout_weight="0"
             android:fontFamily="sans-serif"
             android:gravity="center"
-            android:text="@string/tap_anywhere"
-            android:textColor="#000000"
+            android:text="@string/submit"
+            android:textColor="#FFFFFF"
             android:textSize="20sp"
             android:textStyle="bold" />
 

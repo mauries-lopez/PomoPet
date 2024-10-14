@@ -143,10 +143,10 @@
 
             <View
                 android:id="@+id/view_divider"
-                android:layout_width="1dp"
+                android:layout_width="4dp"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
-                android:background="@android:color/darker_gray" />
+                android:background="#664FA3" />
 
             <LinearLayout
                 android:id="@+id/layout_timer_buttons"

@@ -21,6 +21,8 @@
         <activity
             android:name=".PetScreenActivity"
             android:exported="false" />
+        <activity android:name=".NewEggActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

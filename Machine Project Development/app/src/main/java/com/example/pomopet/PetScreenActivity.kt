@@ -2,12 +2,16 @@ package com.example.pomopet
 
 import android.content.Intent
 import android.graphics.Typeface
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.view.View
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -17,11 +21,21 @@ import com.example.pomopet.databinding.ActivityPetScreenBinding
 
 class PetScreenActivity : AppCompatActivity() {
     var timerIds = Array<Int>(3){-1} // store ids since we will need to dynamically add and delete the views
+    lateinit var animationDrawable: AnimationDrawable
+    var handler = Handler(Looper.getMainLooper())
 
-    companion object { // this is so we can cancel the timer
-        var timerThread : CountDownTimer ? = null
+    companion object {
+        var timerThread : CountDownTimer ? = null // this is so we can cancel the timer
+        const val PET_NAME = "PET_NAME"
+        const val EVOL = "EVOL" // current evolution
+        const val PET_TYPE = "PET_TYPE"
+
+        const val RED_PET = 0
+        const val PURPLE_PET = 1
+        const val ORANGE_PET = 2
     }
 
+    // ----- Set countdown timer and updates the text in the timer
     fun timerThreadStart(hour: Long, min: Long, seconds: Long, hourText: TextView, minText: TextView, secText: TextView){
         var finalMillis = (hour * 3600000) + (min * 60000) +(seconds * 1000)
 
@@ -34,15 +48,18 @@ class PetScreenActivity : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                // to add code here, potentially giving exp?
+                // TO DO: to add code here, potentially giving exp?
             }
         }.start()
 
     }
+
     fun setupTimer(petScreenBinding: ActivityPetScreenBinding, getHour: String, getMin: String, getSec: String)
     {
         // ----- This part deletes edit texts [inputs] and replaces it with the text view of the timer
-        // NOTE: we don't store the ids here, only in cancelTimer when editTexts are applicable
+        // NOTE: we don't store the ids here, only in cancelTimer when editTexts are involved
+        // (aka we need to get their inputs)
+
         // make inputBox (hour) to text view
         petScreenBinding.layoutTimer.removeViewAt(0)
         var hourView = TextView(this)
@@ -104,7 +121,7 @@ class PetScreenActivity : AppCompatActivity() {
 
     fun cancelTimer(petScreenBinding: ActivityPetScreenBinding)
     {
-        // Cancel the timer
+        // ----- Cancel the timer thread
         timerThread?.cancel()
 
         // ----- Change text views to edit text
@@ -169,6 +186,43 @@ class PetScreenActivity : AppCompatActivity() {
         petScreenBinding.timerBtn1.isEnabled = true
     }
 
+    // ----- Just a thread to make the pet move/animate
+    fun petAnimationStart()
+    {
+        // run pet animation
+        Thread {
+            handler.post{
+                animationDrawable.start()
+            }
+        }.start()
+
+    }
+
+    // ----- Set the right animation for current pet and evolution
+    fun petTypeSet(iv: ImageView, petType: Int, evol: Int)
+    {
+        when (petType) {
+            RED_PET->when(evol){
+                1->iv.setImageResource(R.drawable.anim_evol1_red)
+                2->iv.setImageResource(R.drawable.anim_evol2_red)
+                3->iv.setImageResource(R.drawable.anim_evol3_red)
+            }
+            // purple
+            PURPLE_PET->when(evol){
+                1->iv.setImageResource(R.drawable.anim_evol1_purple)
+                2->iv.setImageResource(R.drawable.anim_evol2_purple)
+                3->iv.setImageResource(R.drawable.anim_evol3_purple)
+            }
+            ORANGE_PET->when(evol){
+                1->iv.setImageResource(R.drawable.anim_evol1_orange)
+                2->iv.setImageResource(R.drawable.anim_evol2_orange)
+                3->iv.setImageResource(R.drawable.anim_evol3_orange)
+            }
+
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -177,8 +231,13 @@ class PetScreenActivity : AppCompatActivity() {
         val petScreenBinding: ActivityPetScreenBinding = ActivityPetScreenBinding.inflate(layoutInflater)
         // Change the scene
         setContentView(petScreenBinding.root)
-        // Get Username
+
+        // Get Username, Pet Name, and Pet Type
         val loggedUsername = intent.getStringExtra(RegisterActivity.USERNAME)
+        val petName = intent.getStringExtra(PetScreenActivity.PET_NAME)
+        val petType = intent.getIntExtra(PetScreenActivity.PET_TYPE, -1)
+        val petEvol = intent.getIntExtra(PetScreenActivity.EVOL, -1)
+
         // Display a toast welcoming the user
         Toast.makeText(this, "Welcome to PomoPet, $loggedUsername!", Toast.LENGTH_SHORT).show()
 
@@ -191,14 +250,20 @@ class PetScreenActivity : AppCompatActivity() {
 
         petScreenBinding.timerBtn0.isEnabled = false
 
-        // ----- TO DO, restrict input / input filter
+        // ----- TO DO, restrict input / input filter for timer (max 12 hours, etc)
         // ----- We need to store the ids because of the setOnClickListener algorithm
         // ex. We cannot assume that "timerHrsinputEt" will always be present since we will be deleting it later on
         timerIds[0] = petScreenBinding.timerHrsinputEt.id
         timerIds[1] = petScreenBinding.timerMinsinputEt.id
         timerIds[2] = petScreenBinding.timerSecinputEt.id
 
-        // If timer start button is clicked, test recycler view
+        // ----- Cancel button; Change TextViews to EditText
+        petScreenBinding.timerBtn0.setOnClickListener{
+            // cancel
+            cancelTimer(petScreenBinding)
+        }
+
+        // If timer start button is clicked, change EditText to TextViews
         petScreenBinding.timerBtn1.setOnClickListener{
             var getHour = findViewById<EditText>(timerIds[0]).text.toString()
             var getMin = findViewById<EditText>(timerIds[1]).text.toString()
@@ -227,20 +292,26 @@ class PetScreenActivity : AppCompatActivity() {
             this.startActivity(viewExerCiseTemplateIntentActivity);
         }
 
-        petScreenBinding.timerBtn0.setOnClickListener{
-            // cancel
-            cancelTimer(petScreenBinding)
-        }
+
+        // ----- Set the correct animation for the pet
+        petTypeSet(petScreenBinding.imgPet, petType, petEvol)
+
+        // ----- Run animation
+        animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
+        petAnimationStart()
 
 
-
+        // ----- Set values for username and pet name
         petScreenBinding.txtUsername.text = loggedUsername
+        petScreenBinding.txtPetName.text = petName
 
+    }
 
-
-
-
-
+    // ----- This is to stop the threads prior to finishing the activity
+    override fun onDestroy() {
+        super.onDestroy()
+        animationDrawable.stop()
+        handler.removeCallbacksAndMessages(null)
     }
 }
 
