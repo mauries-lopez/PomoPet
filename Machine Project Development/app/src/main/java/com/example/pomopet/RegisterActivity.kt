@@ -32,7 +32,7 @@ class RegisterActivity : AppCompatActivity() {
             if ( signName.isEmpty() ){
                 Toast.makeText(this, "Enter your username to continue.", Toast.LENGTH_SHORT).show()
             } else { // Else, proceed to PomoPet
-                val pomopetMainActivityIntent = Intent(applicationContext, PomoPetMainActivity::class.java)
+                val pomopetMainActivityIntent = Intent(applicationContext, PetScreenActivity::class.java)
                 // Put username to intent so the main activity can use it
                 pomopetMainActivityIntent.putExtra(USERNAME, signName.toString())
                 // Go to next activity

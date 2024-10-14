@@ -19,7 +19,7 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".PomoPetMainActivity"
+            android:name=".PetScreenActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
