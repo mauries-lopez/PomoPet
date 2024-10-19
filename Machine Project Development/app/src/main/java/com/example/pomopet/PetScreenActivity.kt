@@ -563,7 +563,7 @@ class PetScreenActivity : AppCompatActivity() {
                         "Example Calculation:\n" +
                         "A 1-hour Pomodoro session (3,600 seconds) would earn you:\n" +
                         "3,600 × 0.5 = 1,800 EXP\n" +
-                        "This is enough to level up from Level 1 to Level 2 with an 80% full EXP bar towards Level 3.\n\n" +
+                        "This is enough to level up from Level 1 to Level 2.\n\n" +
                         "EXP Calculation Based on Time:\n" +
                         "[1] If the time is given in hours, the system will compute the total EXP based on the number of hours.\n" +
                         "[2] If the time is given in minutes, the system will compute EXP based on minutes.\n" +
