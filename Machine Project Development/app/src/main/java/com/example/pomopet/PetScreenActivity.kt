@@ -18,6 +18,8 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pomopet.databinding.ActivityPetScreenBinding
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 class PetScreenActivity : AppCompatActivity() {
     var timerIds = Array<Int>(3){-1} // store ids since we will need to dynamically add and delete the views
@@ -36,7 +38,7 @@ class PetScreenActivity : AppCompatActivity() {
     }
 
     // ----- Set countdown timer and updates the text in the timer
-    fun timerThreadStart(hour: Long, min: Long, seconds: Long, hourText: TextView, minText: TextView, secText: TextView){
+    fun timerThreadStart(hour: Long, min: Long, seconds: Long, hourText: TextView, minText: TextView, secText: TextView, petScreenBinding: ActivityPetScreenBinding){
         var finalMillis = (hour * 3600000) + (min * 60000) +(seconds * 1000)
 
         timerThread = object : CountDownTimer(finalMillis, 1000) {
@@ -49,6 +51,72 @@ class PetScreenActivity : AppCompatActivity() {
 
             override fun onFinish() {
                 // TO DO: to add code here, potentially giving exp?
+
+                // Reset Timer and Buttons
+                // Reset Buttons
+                petScreenBinding.timerBtn0.isEnabled = false
+                petScreenBinding.timerBtn1.isEnabled = true
+                // Reset Timer
+                // (1) Remove TextViews
+                petScreenBinding.layoutTimer.removeViewAt(0) // hour
+                petScreenBinding.layoutTimer.removeViewAt(1) // min
+                petScreenBinding.layoutTimer.removeViewAt(2) // sec
+                // (2) Add EditTexts
+                // (2.1) Hour Input
+                var hourInput_et = EditText(this@PetScreenActivity)
+                hourInput_et.id = timerIds[0]
+                hourInput_et.setLayoutParams(
+                    LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1.5f
+                    )
+                )
+                hourInput_et.setEms(10)
+                hourInput_et.hint = "00h"
+                hourInput_et.inputType = InputType.TYPE_CLASS_NUMBER
+                hourInput_et.textAlignment = TEXT_ALIGNMENT_CENTER
+                hourInput_et.textSize = 20f
+                hourInput_et.typeface = Typeface.DEFAULT_BOLD
+                petScreenBinding.layoutTimer.addView(hourInput_et, 0)
+                // (2.2) Minute Input
+                var minInput_et = EditText(this@PetScreenActivity)
+                minInput_et.setLayoutParams(
+                    LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1.5f
+                    )
+                )
+                minInput_et.setEms(10)
+                minInput_et.id = timerIds[1]
+                minInput_et.hint = "00m"
+                minInput_et.inputType = InputType.TYPE_CLASS_NUMBER
+                minInput_et.textAlignment = TEXT_ALIGNMENT_CENTER
+                minInput_et.textSize = 20f
+                minInput_et.typeface = Typeface.DEFAULT_BOLD
+                petScreenBinding.layoutTimer.addView(minInput_et, 2)
+                // (2.3) Second Input
+                var secInput_et = EditText(this@PetScreenActivity)
+                secInput_et.id = timerIds[2]
+                secInput_et.setLayoutParams(
+                    LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        1.5f
+                    )
+                )
+                secInput_et.setEms(10)
+                secInput_et.hint = "00s"
+                secInput_et.inputType = InputType.TYPE_CLASS_NUMBER
+                secInput_et.textAlignment = TEXT_ALIGNMENT_CENTER
+                secInput_et.textSize = 20f
+                secInput_et.typeface = Typeface.DEFAULT_BOLD
+                petScreenBinding.layoutTimer.addView(secInput_et, 4)
+
+                // Update Experience and Level of Pet
+                updatePetExp(hour, min, seconds, petScreenBinding)
+
             }
         }.start()
 
@@ -112,7 +180,7 @@ class PetScreenActivity : AppCompatActivity() {
         timerThreadStart(getHour.toLong(),
             getMin.toLong(),
             getSec.toLong(),
-            hourView, minView, secView)
+            hourView, minView, secView, petScreenBinding)
 
         // ----- Disable start button and enable cancel button
         petScreenBinding.timerBtn0.isEnabled = true
@@ -218,10 +286,184 @@ class PetScreenActivity : AppCompatActivity() {
                 2->iv.setImageResource(R.drawable.anim_evol2_orange)
                 3->iv.setImageResource(R.drawable.anim_evol3_orange)
             }
-
         }
+
     }
 
+    private fun initRestorePetInfo(name: String, curExp: Int, maxExp: Int, level: Int, imagePet: ImageView, petScreenBinding: ActivityPetScreenBinding){
+        // Retrieve Information
+        // TO DO: Should use the local storage to retrieve all pet details of the player. (For MCO2, it's okay if not implemented yet)
+
+        // Change details on screen to display current progress of the pet
+        //petScreenBinding.imgPet.
+        petScreenBinding.txtPetName.text = name // Pet Name
+        petScreenBinding.txtLevel.text = "Level " + level.toString() // Pet Level
+
+        // Experience Bar
+        // Note: Always set the Max before the Progress. It matters.
+        petScreenBinding.progressbarExp.max = maxExp // Maximum Exp to level up
+        petScreenBinding.progressbarExp.progress = curExp // Current Exp
+
+    }
+
+    fun updatePetExp(hour: Long, min: Long, seconds: Long, petScreenBinding: ActivityPetScreenBinding){
+        // Max. Experience per Level
+        // Lv1 : 1000
+        // Lv2 : 2000
+        // Lv3 : 3000
+        // Lv4 : 4000
+        // LvN : N000
+
+        // Level of Evolutions
+        // Lv10 : 2nd Evolution
+        // Lv20 : 3rd Evolution
+
+        // Experience Computation
+        // Per Second -> 0.5 Exp Earned
+        // Example: 1hr Pomodoro -> 1,800 Exp Earned -> Lv1 to Lv2 (80% Filled Exp Bar)
+
+        //If Hour is given, compute exp using hour
+        //If Min is given, compute exp using minutes
+        //If Seconds is given, compute exp using seconds
+        // Retrieve Current Exp. Information
+        var curLvl = petScreenBinding.txtLevel.text
+        var curExp = petScreenBinding.progressbarExp.progress
+        var maxExp = petScreenBinding.progressbarExp.max
+        var earnedExp = 0.0
+        if ( hour != 0.toLong() ){
+            // Compute Exp
+            earnedExp = ((hour * 3600) * 0.5)
+            // If earned exp is over the maximum experience points, level up pet and add the remaining earned exp
+            if ( (earnedExp + curExp.toLong()) >= maxExp.toLong() ){
+                Toast.makeText(this, "Congratulations! Pet leveled up.", Toast.LENGTH_LONG).show()
+
+                // Compute for remaining exp
+                // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
+                val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
+
+                // Since curLvl is a string, find the numbers in the string then use the number
+                val extractedLvl = curLvl.filter { it.isDigit() }.toString()
+                val updatedLvl = (extractedLvl.toIntOrNull()?.plus(1))
+                petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
+                petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus(1000) // Increase Exp. Bar by 1000
+                petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
+
+                // Check if pet needs to be evolved
+                if ( updatedLvl == 10 ||
+                    updatedLvl == 20 ){
+
+                    when (updatedLvl) {
+                        10 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE, 2)
+                        }
+                        20 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 3)
+                        }
+                    }
+                }
+
+                // Add remaining exp
+                petScreenBinding.progressbarExp.progress = remainingExp.toInt()
+
+            } else {
+                // Add Earned Exp to Current Exp
+                petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
+            }
+        } else if ( min != 0.toLong() ){
+            // Compute Exp
+            earnedExp = ((min * 60) * 0.5)
+            // If earned exp is over the maximum experience points, level up pet and add the remaining earned exp
+            if ( (earnedExp + curExp.toLong() ) >= maxExp.toLong() ){
+                Toast.makeText(this, "Congratulations! Pet leveled up.", Toast.LENGTH_LONG).show()
+
+                // Compute for remaining exp
+                // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
+                val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
+
+                // Since curLvl is a string, find the numbers in the string then use the number
+                val extractedLvl = curLvl.filter { it.isDigit() }.toString()
+                val updatedLvl = (extractedLvl.toIntOrNull()?.plus(1))
+                petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
+                petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus(1000) // Increase Exp. Bar by 1000
+                petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
+
+                // Check if pet needs to be evolved
+                if ( updatedLvl == 10 ||
+                    updatedLvl == 20 ||
+                    updatedLvl == 30 ){
+                    when (updatedLvl) {
+                        10 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 1)
+                        }
+                        20 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 2)
+                        }
+                        30 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 3rd Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 3)
+                        }
+                    }
+                }
+
+                // Add remaining exp
+                petScreenBinding.progressbarExp.progress = remainingExp.toInt()
+            } else {
+                // Add Earned Exp to Current Exp
+                petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
+            }
+
+        } else if ( seconds != 0.toLong() ){
+            // Compute Exp
+            earnedExp = seconds * 0.5
+            // If current exp is over the maximum experience points, level up pet and add the remaining earned exp
+            if ( (earnedExp + curExp.toLong() ) >= maxExp.toLong() ){
+                Toast.makeText(this, "Congratulations! Pet leveled up.", Toast.LENGTH_LONG).show()
+
+                // Compute for remaining exp
+                // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
+                val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
+
+                // Since curLvl is a string, find the numbers in the string then use the number
+                val extractedLvl = curLvl.filter { it.isDigit() }.toString()
+                val updatedLvl = (extractedLvl.toIntOrNull()?.plus(1))
+                petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
+                petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus(1000) // Increase Exp. Bar by 1000
+                petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
+
+                // Check if pet needs to be evolved
+                if ( updatedLvl == 10 ||
+                     updatedLvl == 20 ||
+                     updatedLvl == 30 ){
+                    when (updatedLvl) {
+                        10 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 1)
+                        }
+                        20 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 2)
+                        }
+                        30 -> {
+                            Toast.makeText(this, "Congratulations! Pet evolved to the 3rd Evolution" , Toast.LENGTH_LONG).show()
+                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 3)
+                        }
+                    }
+                }
+
+                // Add remaining exp
+                petScreenBinding.progressbarExp.progress = remainingExp.toInt()
+            } else {
+                // Add Earned Exp to Current Exp
+                petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
+            }
+        }
+
+        Toast.makeText(this, "Earned $earnedExp Exp Points!", Toast.LENGTH_LONG).show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -301,9 +543,10 @@ class PetScreenActivity : AppCompatActivity() {
         petAnimationStart()
 
 
-        // ----- Set values for username and pet name
+        // ----- Set values for pet details
         petScreenBinding.txtUsername.text = loggedUsername
-        petScreenBinding.txtPetName.text = petName
+        initRestorePetInfo(petName.toString(), 995, 1000, 9, petScreenBinding.imgPet, petScreenBinding)
+        //petScreenBinding.txtPetName.text = petName
 
     }
 
