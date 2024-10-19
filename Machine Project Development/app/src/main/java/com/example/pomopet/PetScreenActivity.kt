@@ -20,6 +20,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pomopet.databinding.ActivityPetScreenBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -545,7 +546,7 @@ class PetScreenActivity : AppCompatActivity() {
 
         // ----- Pet Help Button
         petScreenBinding.helpBtn.setOnClickListener{
-            val builder = AlertDialog.Builder(this)
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
             builder.setTitle("PomoPet Help")
             builder.setMessage(
                         "This game calculates experience points (EXP) for your pet based on time spent during activities such as Pomodoro sessions. Here's how it works:\n\n" +
@@ -572,7 +573,7 @@ class PetScreenActivity : AppCompatActivity() {
             )
 
             builder.setPositiveButton(android.R.string.ok) { dialog, which ->
-                Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
+                //Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
             }
             builder.show()
         }

@@ -29,7 +29,7 @@
             android:id="@+id/pet_archive_gl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="20"
+            android:layout_weight="50"
             android:clipToPadding="true"
             android:padding="50dp"
             app:columnCount="3"
@@ -48,7 +48,7 @@
                     android:id="@+id/orange_pet_0_iv"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol1_orange" />
             </androidx.cardview.widget.CardView>
 
@@ -65,7 +65,7 @@
                     android:id="@+id/purple_pet_0_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol1_purple" />
             </androidx.cardview.widget.CardView>
 
@@ -82,7 +82,7 @@
                     android:id="@+id/red_pet_0_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol1_red" />
             </androidx.cardview.widget.CardView>
 
@@ -100,7 +100,7 @@
                     android:id="@+id/orange_pet_1_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol2_orange" />
             </androidx.cardview.widget.CardView>
 
@@ -117,7 +117,7 @@
                     android:id="@+id/purple_pet_1_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol2_purple" />
             </androidx.cardview.widget.CardView>
 
@@ -134,7 +134,7 @@
                     android:id="@+id/red_pet_1_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol2_red" />
             </androidx.cardview.widget.CardView>
 
@@ -151,7 +151,7 @@
                     android:id="@+id/orange_pet_2_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol3_orange" />
             </androidx.cardview.widget.CardView>
 
@@ -168,7 +168,7 @@
                     android:id="@+id/purple_pet_2_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol3_purple" />
             </androidx.cardview.widget.CardView>
 
@@ -185,7 +185,7 @@
                     android:id="@+id/red_pet_2_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     app:srcCompat="@drawable/anim_evol3_red" />
             </androidx.cardview.widget.CardView>
 

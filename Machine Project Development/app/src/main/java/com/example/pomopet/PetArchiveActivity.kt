@@ -1,14 +1,15 @@
 package com.example.pomopet
 
 import android.os.Bundle
-import android.view.MotionEvent
 import android.widget.GridLayout
-import android.widget.Toast
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.children
 import com.example.pomopet.databinding.ActivityPetArchiveBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class PetArchiveActivity : AppCompatActivity() {
