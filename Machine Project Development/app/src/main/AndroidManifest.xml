@@ -23,6 +23,8 @@
             android:exported="false" />
         <activity android:name=".NewEggActivity"
             android:exported="false" />
+        <activity android:name=".PetArchiveActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

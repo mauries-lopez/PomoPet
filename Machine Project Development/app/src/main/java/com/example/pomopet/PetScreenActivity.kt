@@ -17,6 +17,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pomopet.databinding.ActivityPetScreenBinding
 import kotlin.math.absoluteValue
@@ -39,7 +40,7 @@ class PetScreenActivity : AppCompatActivity() {
     }
 
     var curPetType = -1
-    
+
     // ----- Set countdown timer and updates the text in the timer
     fun timerThreadStart(hour: Long, min: Long, seconds: Long, hourText: TextView, minText: TextView, secText: TextView, petScreenBinding: ActivityPetScreenBinding){
         var finalMillis = (hour * 3600000) + (min * 60000) +(seconds * 1000)
@@ -491,7 +492,7 @@ class PetScreenActivity : AppCompatActivity() {
 
         // Lines 26 to 33 is for testing purposes. You may delete it or comment it out.
         // Test Activity View Exercise (Delete this after)
-        val viewExerCiseTemplateIntentActivity = Intent(applicationContext, ViewExerciseActivity::class.java)
+        //val viewExerciseTemplateIntentActivity = Intent(applicationContext, ViewExerciseActivity::class.java)
 
         petScreenBinding.timerBtn0.backgroundTintList = this.resources.getColorStateList(R.color.timer_button_color, this.theme)
         petScreenBinding.timerBtn1.backgroundTintList = this.resources.getColorStateList(R.color.timer_button_color, this.theme)
@@ -535,11 +536,46 @@ class PetScreenActivity : AppCompatActivity() {
 
         }
 
-        // ----- FOR TESTING: Moved button for exercise recycler view to here
-        petScreenBinding.btnExerciseTest.setOnClickListener{
-            this.startActivity(viewExerCiseTemplateIntentActivity);
+        // ----- Pet Archive Button
+        petScreenBinding.petArchiveBtn.setOnClickListener{
+            val petArchiveActivity = Intent(applicationContext, PetArchiveActivity::class.java)
+            this.startActivity(petArchiveActivity)
+            //this.startActivity(viewExerciseTemplateIntentActivity);
         }
 
+        // ----- Pet Help Button
+        petScreenBinding.helpBtn.setOnClickListener{
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("PomoPet Help")
+            builder.setMessage(
+                        "This game calculates experience points (EXP) for your pet based on time spent during activities such as Pomodoro sessions. Here's how it works:\n\n" +
+                        "Maximum Experience per Level:\n" +
+                        "Level 1: 1,000 EXP\n" +
+                        "Level 2: 2,000 EXP\n" +
+                        "Level 3: 3,000 EXP\n" +
+                        "Level 4: 4,000 EXP\n" +
+                        "Level N: N * 1000 EXP (i.e., the maximum EXP for a given level is the level number multiplied by 1,000).\n\n" +
+                        "Evolutions:\n" +
+                        "Level 10: 1st Evolution\n" +
+                        "Level 20: 2nd Evolution\n\n" +
+                        "Experience Computation:\n" +
+                        "Per second: You earn 0.5 EXP for each second of activity.\n\n" +
+                        "Example Calculation:\n" +
+                        "A 1-hour Pomodoro session (3,600 seconds) would earn you:\n" +
+                        "3,600 × 0.5 = 1,800 EXP\n" +
+                        "This is enough to level up from Level 1 to Level 2 with an 80% full EXP bar towards Level 3.\n\n" +
+                        "EXP Calculation Based on Time:\n" +
+                        "[1] If the time is given in hours, the system will compute the total EXP based on the number of hours.\n" +
+                        "[2] If the time is given in minutes, the system will compute EXP based on minutes.\n" +
+                        "[3] If the time is given in seconds, the system will compute EXP based on the exact number of seconds.\n\n" +
+                        "You can use this system to track your pet's progress, level it up, and unlock evolutions!"
+            )
+
+            builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+                Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
+            }
+            builder.show()
+        }
 
         // ----- Set the correct animation for the pet
         petTypeSet(petScreenBinding.imgPet, petType, petEvol)
@@ -548,11 +584,12 @@ class PetScreenActivity : AppCompatActivity() {
         animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
         petAnimationStart()
 
-
         // ----- Set values for pet details
         petScreenBinding.txtUsername.text = loggedUsername
         initRestorePetInfo(petName.toString(), 0, 1000, 1, petScreenBinding.imgPet, petScreenBinding)
-        //petScreenBinding.txtPetName.text = petName
+        
+        // View Pet Archive
+
 
     }
 

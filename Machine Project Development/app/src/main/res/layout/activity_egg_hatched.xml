@@ -30,10 +30,10 @@
         <ImageView
             android:id="@+id/img_egg"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:layout_weight="4"
-            android:padding="100dp"
+            android:layout_weight="1"
+            android:padding="80dp"
             app:srcCompat="@drawable/evol1_red1" />
 
         <TextView

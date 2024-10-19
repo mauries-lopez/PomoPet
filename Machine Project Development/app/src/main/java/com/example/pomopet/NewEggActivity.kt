@@ -75,7 +75,7 @@ class NewEggActivity : AppCompatActivity() {
             )
             linearLayoutParams.topMargin = 50
             petHatchedImage.setLayoutParams(linearLayoutParams)
-            petHatchedImage.setPadding(100)
+            petHatchedImage.setPadding(200)
             when (petChosen){
                 PetScreenActivity.RED_PET->petHatchedImage.setImageResource(R.drawable.anim_evol1_red)
                 PetScreenActivity.PURPLE_PET->petHatchedImage.setImageResource(R.drawable.anim_evol1_purple)
