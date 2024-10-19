@@ -8,6 +8,7 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.EditText
@@ -37,6 +38,8 @@ class PetScreenActivity : AppCompatActivity() {
         const val ORANGE_PET = 2
     }
 
+    var curPetType = -1
+    
     // ----- Set countdown timer and updates the text in the timer
     fun timerThreadStart(hour: Long, min: Long, seconds: Long, hourText: TextView, minText: TextView, secText: TextView, petScreenBinding: ActivityPetScreenBinding){
         var finalMillis = (hour * 3600000) + (min * 60000) +(seconds * 1000)
@@ -326,9 +329,9 @@ class PetScreenActivity : AppCompatActivity() {
         //If Min is given, compute exp using minutes
         //If Seconds is given, compute exp using seconds
         // Retrieve Current Exp. Information
-        var curLvl = petScreenBinding.txtLevel.text
-        var curExp = petScreenBinding.progressbarExp.progress
-        var maxExp = petScreenBinding.progressbarExp.max
+        val curLvl = petScreenBinding.txtLevel.text
+        val curExp = petScreenBinding.progressbarExp.progress
+        val maxExp = petScreenBinding.progressbarExp.max
         var earnedExp = 0.0
         if ( hour != 0.toLong() ){
             // Compute Exp
@@ -351,17 +354,19 @@ class PetScreenActivity : AppCompatActivity() {
                 // Check if pet needs to be evolved
                 if ( updatedLvl == 10 ||
                     updatedLvl == 20 ){
-
                     when (updatedLvl) {
                         10 -> {
                             Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE, 2)
+                            petTypeSet(petScreenBinding.imgPet, curPetType, 2)
                         }
                         20 -> {
                             Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 3)
+                            petTypeSet(petScreenBinding.imgPet, curPetType, 3)
                         }
                     }
+                    animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
+                    animationDrawable.stop()
+                    petAnimationStart()
                 }
 
                 // Add remaining exp
@@ -391,22 +396,21 @@ class PetScreenActivity : AppCompatActivity() {
 
                 // Check if pet needs to be evolved
                 if ( updatedLvl == 10 ||
-                    updatedLvl == 20 ||
-                    updatedLvl == 30 ){
+                    updatedLvl == 20 ){
                     when (updatedLvl) {
                         10 -> {
                             Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 1)
+                            petTypeSet(petScreenBinding.imgPet, curPetType, 2)
                         }
                         20 -> {
                             Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 2)
-                        }
-                        30 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 3rd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 3)
+                            petTypeSet(petScreenBinding.imgPet, curPetType, 3)
                         }
                     }
+
+                    animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
+                    animationDrawable.stop()
+                    petAnimationStart()
                 }
 
                 // Add remaining exp
@@ -436,22 +440,22 @@ class PetScreenActivity : AppCompatActivity() {
 
                 // Check if pet needs to be evolved
                 if ( updatedLvl == 10 ||
-                     updatedLvl == 20 ||
-                     updatedLvl == 30 ){
+                    updatedLvl == 20 ){
                     when (updatedLvl) {
                         10 -> {
                             Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 1)
+                            Log.d("PetScreenActivity", PetScreenActivity.PET_TYPE.toString())
+                            petTypeSet(petScreenBinding.imgPet, curPetType, 2)
                         }
                         20 -> {
                             Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 2)
-                        }
-                        30 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 3rd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, PetScreenActivity.PET_TYPE.toInt(), 3)
+                            petTypeSet(petScreenBinding.imgPet, curPetType, 3)
                         }
                     }
+
+                    animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
+                    animationDrawable.stop()
+                    petAnimationStart()
                 }
 
                 // Add remaining exp
@@ -479,6 +483,8 @@ class PetScreenActivity : AppCompatActivity() {
         val petName = intent.getStringExtra(PetScreenActivity.PET_NAME)
         val petType = intent.getIntExtra(PetScreenActivity.PET_TYPE, -1)
         val petEvol = intent.getIntExtra(PetScreenActivity.EVOL, -1)
+
+        curPetType = petType
 
         // Display a toast welcoming the user
         Toast.makeText(this, "Welcome to PomoPet, $loggedUsername!", Toast.LENGTH_SHORT).show()
@@ -545,7 +551,7 @@ class PetScreenActivity : AppCompatActivity() {
 
         // ----- Set values for pet details
         petScreenBinding.txtUsername.text = loggedUsername
-        initRestorePetInfo(petName.toString(), 995, 1000, 9, petScreenBinding.imgPet, petScreenBinding)
+        initRestorePetInfo(petName.toString(), 0, 1000, 1, petScreenBinding.imgPet, petScreenBinding)
         //petScreenBinding.txtPetName.text = petName
 
     }
@@ -557,8 +563,3 @@ class PetScreenActivity : AppCompatActivity() {
         handler.removeCallbacksAndMessages(null)
     }
 }
-
-
-
-
-
