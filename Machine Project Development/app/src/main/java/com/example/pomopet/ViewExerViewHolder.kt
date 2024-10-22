@@ -1,18 +1,21 @@
 package com.example.pomopet
 
-import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import androidx.recyclerview.widget.RecyclerView
+import com.example.pomopet.databinding.ViewExerciseTemplateBinding
 
-class ViewExerViewHolder (itemView: View): ViewHolder(itemView) {
+class ViewExerViewHolder(private val viewbinding: ViewExerciseTemplateBinding) : RecyclerView.ViewHolder(viewbinding.root) {
+    fun linkData(viewExerDataModel: ViewExerDataModel) {
+        viewbinding.exerName.text = viewExerDataModel.exerName
+        viewbinding.exerIcon.setImageResource(viewExerDataModel.exerIcon)
+        viewbinding.exerDesc.text = viewExerDataModel.exerDesc
 
-    //Initialization, di pa ako sure pano via ViewBinding - Mark
-    private val exerName: TextView = itemView.findViewById(R.id.exerName)
-    private val exerIcon: ImageView = itemView.findViewById(R.id.exerIcon)
+        // Set up WebView for YouTube video
+        viewbinding.exerVid.settings.javaScriptEnabled = true
 
-    fun linkData(ViewExerDataModel: ViewExerDataModel){
-        exerName.text = ViewExerDataModel.exerName
-        exerIcon.setImageResource(ViewExerDataModel.exerIcon)
+        // Initialize variable
+        val exerVid = viewExerDataModel.exerVid
+
+        // Load the URL
+        viewbinding.exerVid.loadUrl(exerVid)
     }
 }

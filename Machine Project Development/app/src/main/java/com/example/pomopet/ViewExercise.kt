@@ -3,13 +3,13 @@ package com.example.pomopet
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SnapHelper
 
 //This file is the main file for the viewing of available exercises
-class ViewExerciseActivity : AppCompatActivity() {
+class ViewExercise : AppCompatActivity() {
 
     //Initialize ArrayList
     private val dataModel: ArrayList<ViewExerDataModel> = ExerciseDataSet.loadData()
@@ -22,13 +22,9 @@ class ViewExerciseActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_view_exercise)
 
-        //do we have to make use of viewbinding? - mark
+        //Added
         this.viewExerRecyclerView = findViewById(R.id.exercises_rv)
         this.viewExerRecyclerView.adapter = ViewExerciseAdapter(this.dataModel)
-
-        val helper: SnapHelper = LinearSnapHelper()
-        helper.attachToRecyclerView(viewExerRecyclerView)
-
         this.viewExerRecyclerView.layoutManager = LinearLayoutManager(
             this, LinearLayoutManager.HORIZONTAL, false)
     }

@@ -31,6 +31,5 @@ class MainActivity : AppCompatActivity() {
             // Destroys this activity
             this.finish()
         }
-
     }
 }
