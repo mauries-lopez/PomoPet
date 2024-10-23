@@ -592,6 +592,16 @@ class PetScreenActivity : AppCompatActivity() {
         // View Pet Archive
 
 
+        // Inventory screen
+        petScreenBinding.btnInventory.setOnClickListener{
+            val intent = Intent(this, InventoryActivity::class.java)
+            intent.putExtra(EVOL, petEvol)
+            intent.putExtra(PET_TYPE, curPetType)
+            intent.putExtra(PET_NAME, petName)
+            this.startActivity(intent)
+
+        }
+
     }
 
     // ----- This is to stop the threads prior to finishing the activity
