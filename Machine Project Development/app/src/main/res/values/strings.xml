@@ -15,4 +15,9 @@
     <string name="name_your_pet">Please name your pet.</string>
     <string name="semicolon">:</string>
     <string name="submit">Submit</string>
+    <string name="playlist">Playlist</string>
+    <string name="message">Message</string>
+    <string name="level_up_message">$1$s is ready to level up!\n\n$1$s can level up twice if you exercise alongside them!</string>
+    <string name="level_up_once">Level up x1</string>
+    <string name="level_up_twice">Level up x2</string>
 </resources>
