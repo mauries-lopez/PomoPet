@@ -34,22 +34,14 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="X"
-                android:textAlignment="center"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
         </LinearLayout>
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/levelUpMsg_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="50dp"
             android:paddingRight="30dp"
             android:paddingBottom="10dp"
             android:text="@string/level_up_message"
@@ -65,22 +57,21 @@
             android:paddingBottom="50dp">
 
             <Button
-                android:id="@+id/button8"
+                android:id="@+id/levelUpOne_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="5dp"
                 android:layout_weight="1"
                 android:text="@string/level_up_once"
                 android:textSize="12sp" />
 
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
             <Button
-                android:id="@+id/button9"
+                android:id="@+id/levelUpDouble_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="0dp"
                 android:layout_weight="1"
                 android:text="@string/level_up_twice"
                 android:textSize="12sp" />

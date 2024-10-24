@@ -18,10 +18,9 @@
     <string name="playlist">Playlist</string>
     <string name="message">Message</string>
     <string name="level_up_message">%1$s is ready to level up!\n\n%1$s can level up twice if you exercise alongside them!</string>
-    <string name="level_up_once">Level up x1</string>
-    <string name="level_up_twice">Level up x2</string>
+    <string name="level_up_once">Level up (X1)</string>
+    <string name="level_up_twice">Level up (X2)</string>
     <string name="settings">Settings</string>
-    <string name="volume">Volume</string>
     <string name="break_duration">Set Break Duration</string>
     <string name="locked_item">Item is locked!\nEvolve your pet to see what it is.</string>
     <string name="tap_on_an_item">Tap on an item to view its description.</string>
