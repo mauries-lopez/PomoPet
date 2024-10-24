@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.Looper
 import android.text.InputType
 import android.util.Log
 import android.view.View
@@ -18,7 +17,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pomopet.databinding.ActivityPetScreenBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -607,6 +605,12 @@ class PetScreenActivity : AppCompatActivity() {
             this.startActivity(intent)
 
         }
+
+        petScreenBinding.settingsBtn.setOnClickListener{
+            val intent = Intent(this, SettingsActivity::class.java)
+            this.startActivity(intent)
+        }
+
 
     }
 

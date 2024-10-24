@@ -18,6 +18,18 @@
         app:layout_constraintTop_toTopOf="@+id/layout_main_screen"
         app:srcCompat="?attr/actionModePasteDrawable" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/settings_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="320dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/background_iv"
+        app:layout_constraintTop_toBottomOf="@+id/help_btn"
+        app:srcCompat="@drawable/icon_gear" />
+
     <ImageView
         android:id="@+id/background_iv"
         android:layout_width="0dp"

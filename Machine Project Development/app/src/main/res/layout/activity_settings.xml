@@ -3,7 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#00FFFFFF">
+
+    <ImageView
+        android:id="@+id/background_iv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:tint="#55050505"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/pet_screen_bg"
+        tools:srcCompat="@drawable/pet_screen_bg" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -35,7 +49,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/txt_x_btn"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -46,43 +60,72 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingRight="30dp"
-            android:paddingBottom="10dp"
-            android:text="@string/level_up_message"
-            android:textAlignment="center" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="horizontal"
             android:paddingLeft="30dp"
             android:paddingTop="10dp"
             android:paddingRight="50dp"
-            android:paddingBottom="50dp">
+            android:paddingBottom="20dp">
 
-            <Button
-                android:id="@+id/button8"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/txt_break_duration"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Button" />
+                android:layout_weight="8"
+                android:text="@string/break_duration" />
 
-            <Space
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/et_break_duration"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="4"
+                android:ems="10"
+                android:hint="5"
+                android:inputType="number"
+                android:textAlignment="center" />
 
-            <Button
-                android:id="@+id/button9"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Button" />
+                android:layout_weight="2"
+                android:text="min" />
+
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="30dp"
+            android:paddingTop="10dp"
+            android:paddingRight="50dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Volume" />
+
+        </LinearLayout>
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/slider_volume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/rounded_rectangle"
+            android:padding="15dp"
+            android:valueFrom="0.0"
+            android:valueTo="100.0" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
