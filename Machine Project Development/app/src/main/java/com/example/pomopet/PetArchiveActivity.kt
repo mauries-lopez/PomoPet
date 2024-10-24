@@ -97,10 +97,6 @@ class PetArchiveActivity : AppCompatActivity() {
             this.startActivity(intent)
         }
 
-
-
-
-
         // Back Button
         petArchiveBinding.backBtn.setOnClickListener{
             finish()

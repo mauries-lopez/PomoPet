@@ -17,6 +17,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pomopet.databinding.ActivityPetScreenBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -41,7 +43,47 @@ class PetScreenActivity : AppCompatActivity() {
         const val ORANGE_PET = 2
     }
 
-    var curPetType = -1
+    private var curPetType = -1
+
+    // Level Up Related Variables
+    private lateinit var  petScreenBinding: ActivityPetScreenBinding
+    private var extractedLvl: String = ""
+    private var remainingExp: Double = 0.0
+
+    private val levelUpActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK){
+            val levelScalar = result.data!!.getIntExtra(PetLevelUpActivity.RESULT_KEY, 0)
+
+            val updatedLvl = (extractedLvl.toIntOrNull()?.plus(levelScalar))
+            petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
+            petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus((1000*levelScalar)) // Increase Exp. Bar by 1000
+            petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
+
+            // Check if pet needs to be evolved
+            if ( updatedLvl == 10 ||
+                updatedLvl == 20 ){
+                when (updatedLvl) {
+                    10 -> {
+                        Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
+                        Log.d("PetScreenActivity", PetScreenActivity.PET_TYPE.toString())
+                        petTypeSet(petScreenBinding.imgPet, curPetType, 2)
+                    }
+                    20 -> {
+                        Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
+                        petTypeSet(petScreenBinding.imgPet, curPetType, 3)
+                    }
+                }
+
+                animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
+                animationDrawable.stop()
+                petAnimationStart()
+            }
+
+            // Add remaining exp
+            petScreenBinding.progressbarExp.progress = remainingExp.toInt()
+
+        }
+    }
 
     // ----- Set countdown timer and updates the text in the timer
     fun timerThreadStart(hour: Long, min: Long, seconds: Long, hourText: TextView, minText: TextView, secText: TextView, petScreenBinding: ActivityPetScreenBinding){
@@ -263,17 +305,14 @@ class PetScreenActivity : AppCompatActivity() {
     // ----- Just a thread to make the pet move/animate
     fun petAnimationStart()
     {
-        // instantiate a new looper as quitting a handlerThread destroys the looper
-        handlerThread = HandlerThread("AnimationThread").apply {
-            start()
-        }
-        handler = Handler(handlerThread.looper)
+        // run pet animation
+        Thread {
+            handler.post{
+                animationDrawable.start()
+            }
+        }.start()
 
-        handler.post{
-            animationDrawable.start()
-        }
     }
-
 
     // ----- Set the right animation for current pet and evolution
     fun petTypeSet(iv: ImageView, petType: Int, evol: Int)
@@ -339,9 +378,15 @@ class PetScreenActivity : AppCompatActivity() {
         val curExp = petScreenBinding.progressbarExp.progress
         val maxExp = petScreenBinding.progressbarExp.max
         var earnedExp = 0.0
+        var levelScalar = 0
+
+        // Initialize Global Variables
+        this.petScreenBinding = petScreenBinding
+
         if ( hour != 0.toLong() ){
             // Compute Exp
             earnedExp = ((hour * 3600) * 0.5)
+
             // If earned exp is over the maximum experience points, level up pet and add the remaining earned exp
             if ( (earnedExp + curExp.toLong()) >= maxExp.toLong() ){
                 Toast.makeText(this, "Congratulations! Pet leveled up.", Toast.LENGTH_LONG).show()
@@ -349,34 +394,16 @@ class PetScreenActivity : AppCompatActivity() {
                 // Compute for remaining exp
                 // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
                 val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
+                this.remainingExp = remainingExp
 
                 // Since curLvl is a string, find the numbers in the string then use the number
                 val extractedLvl = curLvl.filter { it.isDigit() }.toString()
-                val updatedLvl = (extractedLvl.toIntOrNull()?.plus(1))
-                petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
-                petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus(1000) // Increase Exp. Bar by 1000
-                petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
+                this.extractedLvl = extractedLvl
 
-                // Check if pet needs to be evolved
-                if ( updatedLvl == 10 ||
-                    updatedLvl == 20 ){
-                    when (updatedLvl) {
-                        10 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, curPetType, 2)
-                        }
-                        20 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, curPetType, 3)
-                        }
-                    }
-                    animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                    handlerThread.quit()
-                    petAnimationStart()
-                }
-
-                // Add remaining exp
-                petScreenBinding.progressbarExp.progress = remainingExp.toInt()
+                // Ask if single or double level up
+                val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
+                intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
+                levelUpActivityLauncher.launch(intent)
 
             } else {
                 // Add Earned Exp to Current Exp
@@ -392,35 +419,16 @@ class PetScreenActivity : AppCompatActivity() {
                 // Compute for remaining exp
                 // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
                 val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
+                this.remainingExp = remainingExp
 
                 // Since curLvl is a string, find the numbers in the string then use the number
                 val extractedLvl = curLvl.filter { it.isDigit() }.toString()
-                val updatedLvl = (extractedLvl.toIntOrNull()?.plus(1))
-                petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
-                petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus(1000) // Increase Exp. Bar by 1000
-                petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
+                this.extractedLvl = extractedLvl
 
-                // Check if pet needs to be evolved
-                if ( updatedLvl == 10 ||
-                    updatedLvl == 20 ){
-                    when (updatedLvl) {
-                        10 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, curPetType, 2)
-                        }
-                        20 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, curPetType, 3)
-                        }
-                    }
-
-                    animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                    handlerThread.quit()
-                    petAnimationStart()
-                }
-
-                // Add remaining exp
-                petScreenBinding.progressbarExp.progress = remainingExp.toInt()
+                // Ask if single or double level up
+                val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
+                intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
+                levelUpActivityLauncher.launch(intent)
             } else {
                 // Add Earned Exp to Current Exp
                 petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
@@ -436,36 +444,17 @@ class PetScreenActivity : AppCompatActivity() {
                 // Compute for remaining exp
                 // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
                 val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
+                this.remainingExp = remainingExp
 
                 // Since curLvl is a string, find the numbers in the string then use the number
                 val extractedLvl = curLvl.filter { it.isDigit() }.toString()
-                val updatedLvl = (extractedLvl.toIntOrNull()?.plus(1))
-                petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
-                petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus(1000) // Increase Exp. Bar by 1000
-                petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
+                this.extractedLvl = extractedLvl
 
-                // Check if pet needs to be evolved
-                if ( updatedLvl == 10 ||
-                    updatedLvl == 20 ){
-                    when (updatedLvl) {
-                        10 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
-                            Log.d("PetScreenActivity", PetScreenActivity.PET_TYPE.toString())
-                            petTypeSet(petScreenBinding.imgPet, curPetType, 2)
-                        }
-                        20 -> {
-                            Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
-                            petTypeSet(petScreenBinding.imgPet, curPetType, 3)
-                        }
-                    }
+                // Ask if single or double level up
+                val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
+                intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
+                levelUpActivityLauncher.launch(intent)
 
-                    animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                    handlerThread.quit()
-                    petAnimationStart()
-                }
-
-                // Add remaining exp
-                petScreenBinding.progressbarExp.progress = remainingExp.toInt()
             } else {
                 // Add Earned Exp to Current Exp
                 petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
@@ -542,7 +531,7 @@ class PetScreenActivity : AppCompatActivity() {
         }
 
         // ----- Pet Archive Button
-        petScreenBinding.petArchiveBtn.setOnClickListener{
+        petScreenBinding.petArchiveLl.setOnClickListener{
             val petArchiveActivity = Intent(applicationContext, PetArchiveActivity::class.java)
             this.startActivity(petArchiveActivity)
             //this.startActivity(viewExerciseTemplateIntentActivity);
@@ -591,13 +580,10 @@ class PetScreenActivity : AppCompatActivity() {
 
         // ----- Set values for pet details
         petScreenBinding.txtUsername.text = loggedUsername
-        initRestorePetInfo(petName.toString(), 0, 1000, 1, petScreenBinding.imgPet, petScreenBinding)
-        
-        // View Pet Archive
-
+        initRestorePetInfo(petName.toString(), 999, 1000, 1, petScreenBinding.imgPet, petScreenBinding)
 
         // Inventory screen
-        petScreenBinding.btnInventory.setOnClickListener{
+        petScreenBinding.petInventoryLl.setOnClickListener{
             val intent = Intent(this, InventoryActivity::class.java)
             intent.putExtra(EVOL, petEvol)
             intent.putExtra(PET_TYPE, curPetType)
@@ -610,7 +596,6 @@ class PetScreenActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             this.startActivity(intent)
         }
-
 
     }
 
@@ -625,10 +610,10 @@ class PetScreenActivity : AppCompatActivity() {
 
     }
 
-
     // ----- This is to stop the threads prior to finishing the activity
     override fun onDestroy() {
         super.onDestroy()
+        animationDrawable.stop()
         handler.removeCallbacksAndMessages(null)
     }
 }
