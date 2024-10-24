@@ -10,12 +10,9 @@ class ViewExerViewHolder(private val viewbinding: ViewExerciseTemplateBinding) :
         viewbinding.exerDesc.text = viewExerDataModel.exerDesc
 
         // Set up WebView for YouTube video
-        viewbinding.exerVid.settings.javaScriptEnabled = true
-
-        // Initialize variable
-        val exerVid = viewExerDataModel.exerVid
-
-        // Load the URL
-        viewbinding.exerVid.loadUrl(exerVid)
+        with(viewbinding.exerVid) {
+            settings.javaScriptEnabled = true // Enable JavaScript
+            loadData(viewExerDataModel.exerVid, "text/html", "UTF-8") // Load
+        }
     }
 }

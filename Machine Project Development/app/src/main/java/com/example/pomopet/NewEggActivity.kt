@@ -1,10 +1,12 @@
 package com.example.pomopet
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.Looper
 import android.text.InputType
 import android.view.Gravity
@@ -27,7 +29,9 @@ class NewEggActivity : AppCompatActivity() {
 
     lateinit var animationDrawablePet: AnimationDrawable
     lateinit var animationDrawableHand: AnimationDrawable
-    var handler = Handler(Looper.getMainLooper())
+
+    var handlerThread = HandlerThread("AnimationThread").apply {start()}
+    var handler = Handler(handlerThread.looper)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,18 +47,25 @@ class NewEggActivity : AppCompatActivity() {
         // ----- Object to animate
         animationDrawableHand = actNewEggActivity.imgHand.drawable as AnimationDrawable
 
-        // ----- Run pet animation
-        Thread {
-            handler.post{
-                animationDrawableHand.start()
-            }
-        }.start()
+        // ----- Run hand animation
+        handler.post{
+            animationDrawableHand.start()
+        }
+
 
         // ----- Tap anywhere to hatch egg
         actNewEggActivity.layoutHatchEgg.setOnClickListener{
 
             // stop hand animation
-            animationDrawableHand.stop()
+            handlerThread.quit()
+
+            // because we quit the thread, the looper does not exist anymore
+            // we need to instantiate a new one
+            handlerThread = HandlerThread("AnimationThread").apply {
+                start()
+            }
+            handler = Handler(handlerThread.looper)
+
 
             // without this code, user will be able to repeatedly click on the screen,
             // generating different pets and potential memory overloading
@@ -85,12 +96,10 @@ class NewEggActivity : AppCompatActivity() {
             animationDrawablePet = petHatchedImage.drawable as AnimationDrawable
 
 
-            // ----- Run pet animation
-            Thread {
-                handler.post{
-                    animationDrawablePet.start()
-                }
-            }.start()
+            handler.post{
+                animationDrawablePet.start()
+            }
+
 
             // ----- More dynamic adding of views
             val congratsText = TextView(this)
@@ -132,6 +141,8 @@ class NewEggActivity : AppCompatActivity() {
             petNameSubmitButton.gravity = Gravity.CENTER
             petNameSubmitButton.text = resources.getText(R.string.submit)
             petNameSubmitButton.textSize = 20f
+            petNameSubmitButton.setTextColor(Color.parseColor("#FFFFFF"))
+            petNameSubmitButton.setBackgroundColor(Color.parseColor("#664FA3"))
             petNameSubmitButton.setTypeface(null, Typeface.BOLD)
             linearLayoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -165,8 +176,7 @@ class NewEggActivity : AppCompatActivity() {
     // ----- Stop animation threads
     override fun onDestroy() {
         super.onDestroy()
-        animationDrawablePet.stop()
-        animationDrawableHand.stop()
+        handlerThread.quit()
         handler.removeCallbacksAndMessages(null)
     }
 }

@@ -6,7 +6,7 @@ import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
-import android.os.Looper
+import android.os.HandlerThread
 import android.text.InputType
 import android.util.Log
 import android.view.View
@@ -17,7 +17,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.pomopet.databinding.ActivityPetScreenBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -27,7 +26,9 @@ import kotlin.math.roundToInt
 class PetScreenActivity : AppCompatActivity() {
     var timerIds = Array<Int>(3){-1} // store ids since we will need to dynamically add and delete the views
     lateinit var animationDrawable: AnimationDrawable
-    var handler = Handler(Looper.getMainLooper())
+
+    var handlerThread = HandlerThread("AnimationThread").apply {start()}
+    var handler = Handler(handlerThread.looper)
 
     companion object {
         var timerThread : CountDownTimer ? = null // this is so we can cancel the timer
@@ -262,14 +263,17 @@ class PetScreenActivity : AppCompatActivity() {
     // ----- Just a thread to make the pet move/animate
     fun petAnimationStart()
     {
-        // run pet animation
-        Thread {
-            handler.post{
-                animationDrawable.start()
-            }
-        }.start()
+        // instantiate a new looper as quitting a handlerThread destroys the looper
+        handlerThread = HandlerThread("AnimationThread").apply {
+            start()
+        }
+        handler = Handler(handlerThread.looper)
 
+        handler.post{
+            animationDrawable.start()
+        }
     }
+
 
     // ----- Set the right animation for current pet and evolution
     fun petTypeSet(iv: ImageView, petType: Int, evol: Int)
@@ -367,7 +371,7 @@ class PetScreenActivity : AppCompatActivity() {
                         }
                     }
                     animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                    animationDrawable.stop()
+                    handlerThread.quit()
                     petAnimationStart()
                 }
 
@@ -411,7 +415,7 @@ class PetScreenActivity : AppCompatActivity() {
                     }
 
                     animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                    animationDrawable.stop()
+                    handlerThread.quit()
                     petAnimationStart()
                 }
 
@@ -456,7 +460,7 @@ class PetScreenActivity : AppCompatActivity() {
                     }
 
                     animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                    animationDrawable.stop()
+                    handlerThread.quit()
                     petAnimationStart()
                 }
 
@@ -592,12 +596,45 @@ class PetScreenActivity : AppCompatActivity() {
         // View Pet Archive
 
 
+        // Inventory screen
+        petScreenBinding.btnInventory.setOnClickListener{
+            val intent = Intent(this, InventoryActivity::class.java)
+            intent.putExtra(EVOL, petEvol)
+            intent.putExtra(PET_TYPE, curPetType)
+            intent.putExtra(PET_NAME, petName)
+            this.startActivity(intent)
+
+        }
+
+        petScreenBinding.settingsBtn.setOnClickListener{
+            val intent = Intent(this, SettingsActivity::class.java)
+            this.startActivity(intent)
+        }
+
+        //Testing Exercises
+        petScreenBinding.button6.setOnClickListener {
+            val intent = Intent(applicationContext, ViewExerciseActivity::class.java)
+            this.startActivity(intent)
+        }
+
+
     }
+
+    override fun onStop() {
+        super.onStop()
+        handlerThread.quit()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        petAnimationStart()
+
+    }
+
 
     // ----- This is to stop the threads prior to finishing the activity
     override fun onDestroy() {
         super.onDestroy()
-        animationDrawable.stop()
         handler.removeCallbacksAndMessages(null)
     }
 }
