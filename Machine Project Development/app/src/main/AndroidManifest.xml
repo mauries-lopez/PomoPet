@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -20,8 +19,11 @@
             android:name=".ViewPetArchiveActivity"
             android:exported="false" />
         <activity
-            android:name=".InventoryActivity"
+            android:name=".PetLevelUpActivity"
             android:exported="false" />
+        <activity
+            android:name=".InventoryActivity"
+            android:exported="false"/>
         <activity
             android:name=".ViewExerciseActivity"
             android:exported="true" />
@@ -31,11 +33,9 @@
         <activity
             android:name=".PetScreenActivity"
             android:exported="false" />
-        <activity
-            android:name=".NewEggActivity"
+        <activity android:name=".NewEggActivity"
             android:exported="false" />
-        <activity
-            android:name=".PetArchiveActivity"
+        <activity android:name=".PetArchiveActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
