@@ -592,8 +592,14 @@ class PetScreenActivity : AppCompatActivity() {
 
         }
 
+        // Settings screen
         petScreenBinding.settingsBtn.setOnClickListener{
             val intent = Intent(this, SettingsActivity::class.java)
+            this.startActivity(intent)
+        }
+
+        petScreenBinding.exerciseLl.setOnClickListener{
+            val intent = Intent(this, ViewExerciseActivity::class.java)
             this.startActivity(intent)
         }
 
