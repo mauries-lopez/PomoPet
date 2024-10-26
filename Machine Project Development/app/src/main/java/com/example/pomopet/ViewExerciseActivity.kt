@@ -1,35 +1,37 @@
 package com.example.pomopet
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SnapHelper
+import androidx.recyclerview.widget.LinearSnapHelper
+import com.example.pomopet.databinding.ActivityViewExerciseBinding
 
-//This file is the main file for the viewing of available exercises
 class ViewExerciseActivity : AppCompatActivity() {
 
-    //Initialize ArrayList
+    // Initialize ArrayList
     private val dataModel: ArrayList<ViewExerDataModel> = ExerciseDataSet.loadData()
 
-    //Recycler View Reference
-    private lateinit var viewExerRecyclerView: RecyclerView
+    private lateinit var viewBinding : ActivityViewExerciseBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_view_exercise)
+        viewBinding = ActivityViewExerciseBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
 
-        //do we have to make use of viewbinding? - mark
-        this.viewExerRecyclerView = findViewById(R.id.exercises_rv)
-        this.viewExerRecyclerView.adapter = ViewExerciseAdapter(this.dataModel)
+        viewBinding.exercisesRv.adapter = ViewExerciseAdapter(dataModel)
 
-        val helper: SnapHelper = LinearSnapHelper()
-        helper.attachToRecyclerView(viewExerRecyclerView)
+        val helper: LinearSnapHelper = LinearSnapHelper()
+        helper.attachToRecyclerView(viewBinding.exercisesRv)
 
-        this.viewExerRecyclerView.layoutManager = LinearLayoutManager(
+        viewBinding.exercisesRv.layoutManager = LinearLayoutManager(
             this, LinearLayoutManager.HORIZONTAL, false)
+
+        viewBinding.floatBackBtn.setOnClickListener {
+            val intent = Intent(this, PetScreenActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }

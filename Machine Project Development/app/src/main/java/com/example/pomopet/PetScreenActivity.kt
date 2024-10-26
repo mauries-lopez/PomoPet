@@ -613,7 +613,6 @@ class PetScreenActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         petAnimationStart()
-
     }
 
     // ----- This is to stop the threads prior to finishing the activity

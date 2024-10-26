@@ -46,15 +46,26 @@ class PetLevelUpActivity : AppCompatActivity() {
             finish()
         }
 
-        // Double Level Up
         petLevelUpActivityBind.levelUpDoubleBtn.setOnClickListener {
+            // Select a random item from the ExerciseDataSet
+            val randomItem = ExerciseDataSet.loadData().shuffled().first()
+
             Toast.makeText(this, "DOUBLE LEVEL UP !!", Toast.LENGTH_SHORT).show()
             scalar = 2
+
+            // Start ChosenExerciseActivity and pass the individual properties
+            val intent = Intent(this, ChosenExerciseActivity::class.java)
+            intent.putExtra("EXER_NAME", randomItem.exerName)
+            intent.putExtra("EXER_ICON", randomItem.exerIcon)
+            intent.putExtra("EXER_VID", randomItem.exerVid)
+            intent.putExtra("EXER_DESC", randomItem.exerDesc)
+            startActivity(intent)
+
+            // Create return intent with the scalar value
             val returnIntent = Intent()
             returnIntent.putExtra(RESULT_KEY, scalar)
             setResult(RESULT_OK, returnIntent)
             finish()
         }
     }
-
 }
