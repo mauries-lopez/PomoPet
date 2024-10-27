@@ -5,6 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/background_iv"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:tint="#55050505"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/pet_screen_bg"
+        tools:srcCompat="@drawable/pet_screen_bg" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
