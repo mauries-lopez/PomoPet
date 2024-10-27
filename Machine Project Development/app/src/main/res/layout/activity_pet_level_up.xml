@@ -55,7 +55,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="50dp"
-            android:paddingRight="30dp"
             android:paddingBottom="10dp"
             android:text="@string/level_up_message"
             android:textAlignment="center" />

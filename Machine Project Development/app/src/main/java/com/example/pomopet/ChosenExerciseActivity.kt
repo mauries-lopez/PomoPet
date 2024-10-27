@@ -32,11 +32,10 @@ class ChosenExerciseActivity : AppCompatActivity() {
         viewBinding.chosenVid.settings.javaScriptEnabled = true
         viewBinding.chosenVid.loadData(exerciseModel.exerVid, "text/html", "UTF-8")
 
-        // Error when clicked, due to animationDrawable in PetScreenActivity
-        /*viewBinding.backBtn.setOnClickListener {
-            val intent = Intent(this, PetScreenActivity::class.java)
-            startActivity(intent)
+        // finish activity as PetScreenActivity never calls finish()
+        viewBinding.backBtn.setOnClickListener {
+            val intent = Intent()
             finish()
-        }*/
+        }
     }
 }
