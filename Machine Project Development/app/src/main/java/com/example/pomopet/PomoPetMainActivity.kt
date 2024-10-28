@@ -18,7 +18,7 @@ class PomoPetMainActivity : AppCompatActivity() {
         // Change the scene
         setContentView(pomoPetMainActivityBind.root)
         // Get Username
-        val loggedUsername = intent.getStringExtra(RegisterActivity.USERNAME)
+        val loggedUsername = intent.getStringExtra(PetScreenActivity.USERNAME)
         // Display a toast welcoming the user
         Toast.makeText(this, "Welcome to PomoPet, $loggedUsername!", Toast.LENGTH_SHORT).show()
 

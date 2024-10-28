@@ -37,6 +37,8 @@
             android:exported="false" />
         <activity android:name=".PetArchiveActivity"
             android:exported="false" />
+        <activity android:name=".ChosenExerciseActivity"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
