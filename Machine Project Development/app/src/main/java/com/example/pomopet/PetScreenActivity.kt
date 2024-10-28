@@ -85,8 +85,7 @@ class PetScreenActivity : AppCompatActivity() {
                 petTypeSet(petScreenBinding.imgPet, curPetType, 2)
                 updateIntFile(PetScreenActivity.PET_EVOL, 2)
 
-                animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                animationDrawable.stop()
+                petAnimationStopAndStartNewLooper()
                 petAnimationStart()
             }
             else if (updatedLvl >= 20 && curPetEvol <= 2)
@@ -95,8 +94,7 @@ class PetScreenActivity : AppCompatActivity() {
                 petTypeSet(petScreenBinding.imgPet, curPetType, 3)
                 updateIntFile(PetScreenActivity.PET_EVOL, 3)
 
-                animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                animationDrawable.stop()
+                petAnimationStopAndStartNewLooper()
                 petAnimationStart()
             }
 
@@ -233,8 +231,7 @@ class PetScreenActivity : AppCompatActivity() {
             getSec = setTo0IfEmpty(getSec)
 
             // 00:00:00
-            if ( (getHour.isEmpty() && getMin.isEmpty() && getSec.isEmpty()) ||
-                (getHour.toInt() == 0 &&  getMin.toInt() == 0 && getSec.toInt() == 0))
+            if (getHour.toInt() == 0 &&  getMin.toInt() == 0 && getSec.toInt() == 0)
                 Toast.makeText(this, "Cannot set timer to 0h 0m 0s.", Toast.LENGTH_SHORT).show()
             else if (getMin.toInt() < 0 || getMin.toInt() > 59 )
                 Toast.makeText(this, "Minutes must be in range of 0 to 59.", Toast.LENGTH_SHORT).show()
@@ -394,13 +391,27 @@ class PetScreenActivity : AppCompatActivity() {
     // ----- Just a thread to make the pet move/animate
     fun petAnimationStart()
     {
-        // run pet animation
-        Thread {
-            handler.post{
-                animationDrawable.start()
-            }
-        }.start()
+        animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
 
+        // run pet animation
+        handler.post{
+            animationDrawable.start()
+        }
+
+
+    }
+
+    fun petAnimationStopAndStartNewLooper()
+    {
+        // stop animation
+        handlerThread.quit()
+
+        // because we quit the thread, the looper does not exist anymore
+        // we need to instantiate a new one
+        handlerThread = HandlerThread("AnimationThread").apply {
+            start()
+        }
+        handler = Handler(handlerThread.looper)
     }
 
     // ----- Set the right animation for current pet and evolution
@@ -566,7 +577,7 @@ class PetScreenActivity : AppCompatActivity() {
         petTypeSet(petScreenBinding.imgPet, curPetType, curPetEvol)
 
         // ----- Run animation
-        animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
+
         petAnimationStart()
 
         // ----- Set values for pet details
@@ -651,20 +662,14 @@ class PetScreenActivity : AppCompatActivity() {
 
     }
 
-    override fun onStop() {
-        super.onStop()
-        handlerThread.quit()
-    }
-
     override fun onResume() {
         super.onResume()
-        petAnimationStart()
     }
 
     // ----- This is to stop the threads prior to finishing the activity
     override fun onDestroy() {
         super.onDestroy()
-        animationDrawable.stop()
+        handlerThread.quit()
         handler.removeCallbacksAndMessages(null)
     }
 }

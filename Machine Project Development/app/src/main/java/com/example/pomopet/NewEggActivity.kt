@@ -123,8 +123,8 @@ class NewEggActivity : AppCompatActivity() {
         editor.putString(PetScreenActivity.PET_NAME, petName)
         editor.putInt(PetScreenActivity.PET_TYPE, petChosen)
         editor.putBoolean(PetScreenActivity.HAS_REGISTERED, true)
-        editor.putInt(PetScreenActivity.PET_LEVEL, 9)
-        editor.putInt(PetScreenActivity.PET_EXP, 999)
+        editor.putInt(PetScreenActivity.PET_LEVEL, 1)
+        editor.putInt(PetScreenActivity.PET_EXP, 0)
         editor.putInt(PetScreenActivity.PET_MAX_EXP, 1000)
         editor.putInt(PetScreenActivity.PET_EVOL, 1)
 
