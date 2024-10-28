@@ -29,8 +29,7 @@ class ViewExerciseActivity : AppCompatActivity() {
             this, LinearLayoutManager.HORIZONTAL, false)
 
         viewBinding.floatBackBtn.setOnClickListener {
-            val intent = Intent(this, PetScreenActivity::class.java)
-            startActivity(intent)
+            val intent = Intent()
             finish()
         }
     }
