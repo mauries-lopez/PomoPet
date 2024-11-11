@@ -58,8 +58,11 @@ class PetScreenActivity : AppCompatActivity() {
     private var handlerThread = HandlerThread("AnimationThread").apply {start()}
     private var handler = Handler(handlerThread.looper)
 
-    // Level Up Related Variables
+
+    // screen binding
     private lateinit var petScreenBinding: ActivityPetScreenBinding
+
+    // Level Up Related Variables
     private var extractedLvl: String = ""
     private var remainingExp: Double = 0.0
     private lateinit var levelUpTextView: TextView
@@ -87,11 +90,15 @@ class PetScreenActivity : AppCompatActivity() {
 
     private val levelUpActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK){
+
             val levelScalar = result.data!!.getIntExtra(PetLevelUpActivity.RESULT_KEY, 0)
 
             val updatedLvl = (extractedLvl.toIntOrNull()?.plus(levelScalar))
             petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
             currentPet.pet_level = updatedLvl!!
+
+            Log.d("levelUpActivityLauncher", "updatedLvl: " + updatedLvl)
+
 
             val nextMaxExp = petScreenBinding.progressbarExp.max.plus((1000*levelScalar)) // Increase Exp. Bar by 1000
             petScreenBinding.progressbarExp.max = nextMaxExp
@@ -123,11 +130,12 @@ class PetScreenActivity : AppCompatActivity() {
             // Add remaining exp
             petScreenBinding.progressbarExp.progress = remainingExp.toInt()
             currentPet.pet_exp = remainingExp.toInt()
-            currentPet.is_level_up = 0
+
+            Log.d("levelUpActivityLauncher", "remainingExp: " + remainingExp.toInt())
 
             // save all changes
             pomoDBHelper.savePetExp(currentPet)
-            pomoDBHelper.setPetToLevelUp(currentPet)
+            pomoDBHelper.resetLevelUp(currentPet)
 
             removeLevelUpNotif()
 
@@ -626,6 +634,10 @@ class PetScreenActivity : AppCompatActivity() {
         petScreenBinding.progressbarExp.max = currentPet.pet_max_exp // Maximum Exp to level up
         petScreenBinding.progressbarExp.progress = currentPet.pet_exp // Current Exp
 
+        // level up overflow
+        this.remainingExp = currentPet.remaining_exp.toDouble()
+        this.extractedLvl = currentPet.extracted_lvl
+
         if (currentPet.is_level_up == 1)
             makeLevelUpUI()
 
@@ -645,18 +657,20 @@ class PetScreenActivity : AppCompatActivity() {
             // Compute for remaining exp
             // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
             val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
-            this.remainingExp = remainingExp
+            this.remainingExp += remainingExp
+            currentPet.remaining_exp = remainingExp.toInt()
 
             // Since curLvl is a string, find the numbers in the string then use the number
             val extractedLvl = curLvl.filter { it.isDigit() }.toString()
             this.extractedLvl = extractedLvl
+            currentPet.extracted_lvl = extractedLvl
 
             // pause timer
             pauseTimer()
 
             makeLevelUpUI()
 
-            currentPet.is_level_up = 1
+
             pomoDBHelper.setPetToLevelUp(currentPet)
 
             // Ask if single or double level up

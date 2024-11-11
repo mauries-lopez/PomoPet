@@ -57,6 +57,7 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
                 c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_PET_MAX_EXP)),
                 c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_IS_LEVEL_UP)),
                 c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_REMAINING_EXP)),
+                c.getString(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_EXTRACTED_LVL)),
                 c.getLong(c.getColumnIndexOrThrow(DatabaseRef._ID))
                 ))
         }
@@ -75,6 +76,9 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
         values.put(DatabaseRef.COLUMN_NAME_PET_EXP, pomoModel.pet_exp)
         values.put(DatabaseRef.COLUMN_NAME_PET_MAX_EXP, pomoModel.pet_max_exp)
         values.put(DatabaseRef.COLUMN_NAME_PET_TYPE, pomoModel.pet_type)
+        values.put(DatabaseRef.COLUMN_NAME_IS_LEVEL_UP, pomoModel.is_level_up)
+        values.put(DatabaseRef.COLUMN_NAME_REMAINING_EXP, pomoModel.remaining_exp)
+        values.put(DatabaseRef.COLUMN_NAME_EXTRACTED_LVL, pomoModel.extracted_lvl)
 
         val id: Long = database.insert(DatabaseRef.TABLE_NAME, null, values)
         database.close()
@@ -107,7 +111,9 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
 
         val values = ContentValues()
 
-        values.put(DatabaseRef.COLUMN_NAME_IS_LEVEL_UP, pomoModel.is_level_up)
+        values.put(DatabaseRef.COLUMN_NAME_IS_LEVEL_UP, 1)
+        values.put(DatabaseRef.COLUMN_NAME_REMAINING_EXP, pomoModel.remaining_exp)
+        values.put(DatabaseRef.COLUMN_NAME_EXTRACTED_LVL, pomoModel.extracted_lvl)
 
         val rowsUpdated = database.update(DatabaseRef.TABLE_NAME, values, DatabaseRef._ID + "= ?", arrayOf(pomoModel.id.toString()))
         database.close()
@@ -116,6 +122,25 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
 
 
     }
+
+    fun resetLevelUp(pomoModel: PomoModel): Boolean {
+        val database = this.writableDatabase
+
+        val values = ContentValues()
+
+        values.put(DatabaseRef.COLUMN_NAME_IS_LEVEL_UP, 0)
+        values.put(DatabaseRef.COLUMN_NAME_REMAINING_EXP, 0)
+        values.put(DatabaseRef.COLUMN_NAME_EXTRACTED_LVL, "")
+
+        val rowsUpdated = database.update(DatabaseRef.TABLE_NAME, values, DatabaseRef._ID + "= ?", arrayOf(pomoModel.id.toString()))
+        database.close()
+
+        return rowsUpdated < 1
+    }
+
+
+
+
 
 
     private object DatabaseRef {
@@ -133,6 +158,7 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
         const val COLUMN_NAME_PET_TYPE = "pet_type"
         const val COLUMN_NAME_IS_LEVEL_UP = "level_up"
         const val COLUMN_NAME_REMAINING_EXP = "remaining_exp"
+        const val COLUMN_NAME_EXTRACTED_LVL = "extracted_lvl"
 
 
         const val CREATE_TABLE_STATEMENT =
@@ -146,7 +172,8 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
                     COLUMN_NAME_PET_MAX_EXP + " INT, " +
                     COLUMN_NAME_PET_TYPE + " INT, " +
                     COLUMN_NAME_IS_LEVEL_UP + " INT, " +
-                    COLUMN_NAME_REMAINING_EXP + " INT)"
+                    COLUMN_NAME_REMAINING_EXP + " INT, " +
+                    COLUMN_NAME_EXTRACTED_LVL + " TEXT)"
 
         const val DROP_TABLE_STATEMENT = "DROP TABLE IF EXISTS " + TABLE_NAME
     }
