@@ -36,6 +36,11 @@ class PetLevelUpActivity : AppCompatActivity() {
 
         // Get Level Up Choice
         var scalar = 0 // Initialize scalar at the class level
+
+        petLevelUpActivityBind.txtMsgXBtn.setOnClickListener{
+            finish()
+        }
+
         // Single Level Up
         petLevelUpActivityBind.levelUpOneBtn.setOnClickListener {
             Toast.makeText(this, "SINGLE LEVEL UP !!", Toast.LENGTH_SHORT).show()

@@ -55,6 +55,8 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
                 c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_PET_EVOL)),
                 c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_PET_EXP)),
                 c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_PET_MAX_EXP)),
+                c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_IS_LEVEL_UP)),
+                c.getInt(c.getColumnIndexOrThrow(DatabaseRef.COLUMN_NAME_REMAINING_EXP)),
                 c.getLong(c.getColumnIndexOrThrow(DatabaseRef._ID))
                 ))
         }
@@ -99,6 +101,23 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
     }
 
 
+    // save if pet is going to level up
+    fun setPetToLevelUp(pomoModel: PomoModel): Boolean{
+        val database = this.writableDatabase
+
+        val values = ContentValues()
+
+        values.put(DatabaseRef.COLUMN_NAME_IS_LEVEL_UP, pomoModel.is_level_up)
+
+        val rowsUpdated = database.update(DatabaseRef.TABLE_NAME, values, DatabaseRef._ID + "= ?", arrayOf(pomoModel.id.toString()))
+        database.close()
+
+        return rowsUpdated < 1
+
+
+    }
+
+
     private object DatabaseRef {
         const val DATABASE_VERSION = 1
         const val DATABASE_NAME = "pomopet.db"
@@ -112,6 +131,8 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
         const val COLUMN_NAME_PET_EXP = "pet_exp"
         const val COLUMN_NAME_PET_MAX_EXP = "pet_max_exp"
         const val COLUMN_NAME_PET_TYPE = "pet_type"
+        const val COLUMN_NAME_IS_LEVEL_UP = "level_up"
+        const val COLUMN_NAME_REMAINING_EXP = "remaining_exp"
 
 
         const val CREATE_TABLE_STATEMENT =
@@ -123,7 +144,9 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
                     COLUMN_NAME_PET_EVOL + " INT, " +
                     COLUMN_NAME_PET_EXP + " INT, " +
                     COLUMN_NAME_PET_MAX_EXP + " INT, " +
-                    COLUMN_NAME_PET_TYPE + " INT)"
+                    COLUMN_NAME_PET_TYPE + " INT, " +
+                    COLUMN_NAME_IS_LEVEL_UP + " INT, " +
+                    COLUMN_NAME_REMAINING_EXP + " INT)"
 
         const val DROP_TABLE_STATEMENT = "DROP TABLE IF EXISTS " + TABLE_NAME
     }

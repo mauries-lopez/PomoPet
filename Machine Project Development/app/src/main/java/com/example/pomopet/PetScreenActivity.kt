@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.EditText
@@ -61,6 +62,7 @@ class PetScreenActivity : AppCompatActivity() {
     private lateinit var petScreenBinding: ActivityPetScreenBinding
     private var extractedLvl: String = ""
     private var remainingExp: Double = 0.0
+    private lateinit var levelUpTextView: TextView
 
     // timer variables
     private var remainingMillisTimer = 0L
@@ -70,6 +72,7 @@ class PetScreenActivity : AppCompatActivity() {
     private lateinit var hourView: TextView
     private lateinit var minView: TextView
     private lateinit var secView: TextView
+    private var levelUpPause = -1 // which timer triggered the pause
 
     // settings variables
     private var currentPomodoro = -1
@@ -120,12 +123,21 @@ class PetScreenActivity : AppCompatActivity() {
             // Add remaining exp
             petScreenBinding.progressbarExp.progress = remainingExp.toInt()
             currentPet.pet_exp = remainingExp.toInt()
+            currentPet.is_level_up = 0
 
             // save all changes
             pomoDBHelper.savePetExp(currentPet)
+            pomoDBHelper.setPetToLevelUp(currentPet)
+
+            removeLevelUpNotif()
 
             // resume timer
-            timerThreadStart(remainingMillisTimer)
+            if (currentPomodoro > 0) {
+                if (levelUpPause == 0)
+                    timerThreadStart(remainingMillisTimer)
+                else if (levelUpPause == 1)
+                    breakThreadStart(remainingMillisTimer)
+            }
         }
     }
 
@@ -217,6 +229,8 @@ class PetScreenActivity : AppCompatActivity() {
                     petScreenBinding.timerBtn1.text = resources.getString(R.string.start)
                     isPomoRunning = false
 
+                    levelUpPause = -1
+
                     // ----- Check if to continue Pomodoro
                     checkPomodoro()
 
@@ -229,14 +243,12 @@ class PetScreenActivity : AppCompatActivity() {
 
 
     // ----- Set countdown timer and updates the text in the timer
-    private fun breakThreadStart(){
+    private fun breakThreadStart(finalMillis: Long){
         if (!isBreakRunning) {
             isBreakRunning = true
 
             // ----- Change text to pause
             petScreenBinding.timerBtn1.text = resources.getString(R.string.pause)
-
-            val finalMillis = currentBreakDuration.toLong() * 60000
 
             timerThread = object : CountDownTimer(finalMillis, 1000) {
                 var hourMinSec = arrayOf(0L, 0L, 0L)
@@ -251,6 +263,9 @@ class PetScreenActivity : AppCompatActivity() {
                 }
 
                 override fun onFinish() {
+
+                    levelUpPause = -1
+
                     // ----- Set button text to start
                     petScreenBinding.timerBtn1.text = resources.getString(R.string.start)
                     isBreakRunning = false
@@ -264,6 +279,40 @@ class PetScreenActivity : AppCompatActivity() {
 
     }
 
+    private fun makeLevelUpUI()
+    {
+        levelUpTextView = TextView(this)
+        levelUpTextView.setLayoutParams(
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                0f
+            )
+        )
+        levelUpTextView.setBackgroundColor(Color.parseColor("#E4E0EE"))
+        levelUpTextView.gravity = Gravity.CENTER
+        levelUpTextView.setPadding(5, 5, 5, 5)
+        levelUpTextView.text = resources.getString(R.string.tap_here_to_level_up)
+        levelUpTextView.setTextColor(Color.parseColor("#3C266F"))
+        levelUpTextView.setTypeface(null, Typeface.BOLD)
+
+        levelUpTextView.setOnClickListener{
+
+            // Ask if single or double level up
+            val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
+            intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
+            levelUpActivityLauncher.launch(intent)
+
+        }
+        petScreenBinding.layoutMainScreen.addView(levelUpTextView, 5)
+
+    }
+
+    private fun removeLevelUpNotif()
+    {
+        petScreenBinding.layoutMainScreen.removeViewAt(5)
+    }
+
     // ----- Only used in timerThreadStart, breakThreadStart already assumes that there is a Pomodoro afterwards
     private fun checkPomodoro()
     {
@@ -273,7 +322,7 @@ class PetScreenActivity : AppCompatActivity() {
         // if pomodoro > 0, start break
         if (currentPomodoro > 0) {
             changeUITimerToBreak()
-            breakThreadStart()
+            breakThreadStart(settingsBreakDuration * 60000L)
         }
         // else, end
         else
@@ -457,12 +506,16 @@ class PetScreenActivity : AppCompatActivity() {
             timerThread?.cancel()
             isPomoRunning = false
 
+            levelUpPause = 0
+
             // ----- Change text to resume
             petScreenBinding.timerBtn1.text = resources.getString(R.string.resume)
         }
         else if (isBreakRunning) {
             timerThread?.cancel()
             isBreakRunning = false
+
+            levelUpPause = 1
 
             // ----- Change text to resume
             petScreenBinding.timerBtn1.text = resources.getString(R.string.resume)
@@ -473,6 +526,8 @@ class PetScreenActivity : AppCompatActivity() {
 
     private fun cancelTimer(petScreenBinding: ActivityPetScreenBinding)
     {
+        levelUpPause = -1
+
         // ----- Cancel the timer thread
         if (isPomoRunning) {
             timerThread?.cancel()
@@ -571,6 +626,9 @@ class PetScreenActivity : AppCompatActivity() {
         petScreenBinding.progressbarExp.max = currentPet.pet_max_exp // Maximum Exp to level up
         petScreenBinding.progressbarExp.progress = currentPet.pet_exp // Current Exp
 
+        if (currentPet.is_level_up == 1)
+            makeLevelUpUI()
+
         // DEBUG for exp
         Log.d("CurrentPetExp", currentPet.pet_exp.toString())
 
@@ -595,6 +653,11 @@ class PetScreenActivity : AppCompatActivity() {
 
             // pause timer
             pauseTimer()
+
+            makeLevelUpUI()
+
+            currentPet.is_level_up = 1
+            pomoDBHelper.setPetToLevelUp(currentPet)
 
             // Ask if single or double level up
             val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
@@ -786,13 +849,6 @@ class PetScreenActivity : AppCompatActivity() {
 
 
 
-
-
-
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     // ----- This is to stop the threads prior to finishing the activity
@@ -800,5 +856,7 @@ class PetScreenActivity : AppCompatActivity() {
         super.onDestroy()
         handlerThread.quit()
         handler.removeCallbacksAndMessages(null)
+
+        timerThread?.cancel()
     }
 }

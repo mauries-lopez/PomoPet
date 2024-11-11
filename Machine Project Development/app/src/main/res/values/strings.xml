@@ -18,6 +18,7 @@
     <string name="playlist">Playlist</string>
     <string name="message">Message</string>
     <string name="level_up_message">%1$s is ready to level up!\n\n%1$s can level up twice if you exercise alongside them!</string>
+    <string name="tap_here_to_level_up">Tap here to level up!</string>
     <string name="level_up_once">Level up (X1)</string>
     <string name="level_up_twice">Level up (X2)</string>
     <string name="resume">Resume</string>
