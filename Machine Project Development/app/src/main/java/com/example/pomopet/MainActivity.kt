@@ -10,6 +10,8 @@ import com.example.pomopet.databinding.ActivityTitleScreenBinding
 
 /* This is where the whole application starts */
 class MainActivity : AppCompatActivity() {
+    private lateinit var pomoDBHelper: PomoDBHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -18,15 +20,16 @@ class MainActivity : AppCompatActivity() {
         // ViewBind activity_title_screen.xml
         val actTitleScreenBind: ActivityTitleScreenBinding = ActivityTitleScreenBinding.inflate(layoutInflater)
 
-        // Read SharedPreferences from activity pet screen, this is to check if user exists
-        val sp = getSharedPreferences(PetScreenActivity.FILE_PET, MODE_PRIVATE)
 
         // Change the scene
         setContentView(actTitleScreenBind.root)
 
         // Change to Register Screen if user tapped anywhere in the screen
         actTitleScreenBind.layoutTitleScreenCl.setOnClickListener{
-            val hasRegistered = sp.getBoolean(PetScreenActivity.HAS_REGISTERED, false)
+
+            pomoDBHelper = PomoDBHelper.getInstance(this@MainActivity)!!
+
+            val hasRegistered = pomoDBHelper.getPet().isNotEmpty()
 
             // If new user, change to register screen. Else, go to activity main directly.
             if (!hasRegistered)
@@ -34,7 +37,7 @@ class MainActivity : AppCompatActivity() {
                 // Make intent of the next activity (Make sure to also include the intent in AndroidManifext.xml
                 val registerIntent = Intent(applicationContext, RegisterActivity::class.java)
                 // Go to next activity
-                this.startActivity(registerIntent);
+                this.startActivity(registerIntent)
             }
 
             // existing user
