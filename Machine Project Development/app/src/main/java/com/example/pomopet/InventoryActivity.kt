@@ -103,7 +103,7 @@ class InventoryActivity : AppCompatActivity() {
 
         val name = intent.getStringExtra(PetScreenActivity.PET_NAME).toString()
         val type = intent.getIntExtra(PetScreenActivity.PET_TYPE, -1)
-        val evol = intent.getIntExtra(PetScreenActivity.EVOL, -1)
+        val evol = intent.getIntExtra(PetScreenActivity.PET_EVOL, -1)
 
         // default values
         item1Image = R.drawable.item_questionmark

@@ -14,6 +14,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // settings sharedpreferences, separate from file_pet
         val sharedPreferences = getSharedPreferences(FILE_SETTINGS, MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
@@ -46,6 +47,7 @@ class SettingsActivity : AppCompatActivity() {
 
             Toast.makeText(this, "Successfully reset settings!", Toast.LENGTH_SHORT).show()
         }
+
         settingsBinding.btnSaveSettings.setOnClickListener{
             editor.putFloat(VOLUME_SETTINGS, volumeLevel)
             editor.putInt(POMO_BREAK_DURATION_SETTINGS, settingsBinding.etBreakDuration.text.toString().toInt())

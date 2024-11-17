@@ -33,17 +33,30 @@ class PetScreenActivity : AppCompatActivity() {
     var handler = Handler(handlerThread.looper)
 
     companion object {
-        var timerThread : CountDownTimer ? = null // this is so we can cancel the timer
-        const val PET_NAME = "PET_NAME"
-        const val EVOL = "EVOL" // current evolution
-        const val PET_TYPE = "PET_TYPE"
+        // save file name for pet related stuff + user
+        const val FILE_PET = "FILE_PET"                 // file, used in sp
 
+        // for a synchronized naming convention for intents and sharedpreferences
+        const val PET_NAME = "PET_NAME"                 // string
+        const val PET_EVOL = "PET_EVOL"                 // int
+        const val PET_LEVEL = "PET_LEVEL"               // int
+        const val PET_EXP = "PET_EXP"                   // int
+        const val PET_MAX_EXP = "PET_MAX_EXP"           // int
+        const val PET_TYPE = "PET_TYPE"                 // int
+        const val USERNAME = "USERNAME"                 // string
+        const val HAS_REGISTERED = "HAS_REGISTERED"     // boolean; only used in title screen
+
+        var timerThread : CountDownTimer ? = null       // this is so we can cancel the timer
+
+        // pet types
         const val RED_PET = 0
         const val PURPLE_PET = 1
         const val ORANGE_PET = 2
     }
-
+    private lateinit var loggedUsername: String
+    private lateinit var petName: String
     private var curPetType = -1
+    private var curPetEvol = -1
 
     // Level Up Related Variables
     private lateinit var  petScreenBinding: ActivityPetScreenBinding
@@ -56,31 +69,38 @@ class PetScreenActivity : AppCompatActivity() {
 
             val updatedLvl = (extractedLvl.toIntOrNull()?.plus(levelScalar))
             petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
-            petScreenBinding.progressbarExp.max = petScreenBinding.progressbarExp.max.plus((1000*levelScalar)) // Increase Exp. Bar by 1000
+            updateIntFile(PetScreenActivity.PET_LEVEL, updatedLvl!!.toInt())
+
+            val nextMaxExp = petScreenBinding.progressbarExp.max.plus((1000*levelScalar)) // Increase Exp. Bar by 1000
+            petScreenBinding.progressbarExp.max = nextMaxExp
+            updateIntFile(PetScreenActivity.PET_MAX_EXP, nextMaxExp)
+
             petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
 
-            // Check if pet needs to be evolved
-            if ( updatedLvl == 10 ||
-                updatedLvl == 20 ){
-                when (updatedLvl) {
-                    10 -> {
-                        Toast.makeText(this, "Congratulations! Pet evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
-                        Log.d("PetScreenActivity", PetScreenActivity.PET_TYPE.toString())
-                        petTypeSet(petScreenBinding.imgPet, curPetType, 2)
-                    }
-                    20 -> {
-                        Toast.makeText(this, "Congratulations! Pet evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
-                        petTypeSet(petScreenBinding.imgPet, curPetType, 3)
-                    }
-                }
 
-                animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-                animationDrawable.stop()
+            // Check if pet needs to be evolved
+            if (updatedLvl >= 10 && curPetEvol == 1) {
+                Toast.makeText(this, "Congratulations! $petName evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
+                Log.d("PetScreenActivity", PetScreenActivity.PET_TYPE.toString())
+                petTypeSet(petScreenBinding.imgPet, curPetType, 2)
+                updateIntFile(PetScreenActivity.PET_EVOL, 2)
+
+                petAnimationStopAndStartNewLooper()
+                petAnimationStart()
+            }
+            else if (updatedLvl >= 20 && curPetEvol <= 2)
+            {
+                Toast.makeText(this, "Congratulations! $petName evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
+                petTypeSet(petScreenBinding.imgPet, curPetType, 3)
+                updateIntFile(PetScreenActivity.PET_EVOL, 3)
+
+                petAnimationStopAndStartNewLooper()
                 petAnimationStart()
             }
 
             // Add remaining exp
             petScreenBinding.progressbarExp.progress = remainingExp.toInt()
+            updateIntFile(PetScreenActivity.PET_EXP, remainingExp.toInt())
 
         }
     }
@@ -163,14 +183,80 @@ class PetScreenActivity : AppCompatActivity() {
                 petScreenBinding.layoutTimer.addView(secInput_et, 4)
 
                 // Update Experience and Level of Pet
-                updatePetExp(hour, min, seconds, petScreenBinding)
+                updatePetExp(hour, min, seconds)
 
             }
         }.start()
 
     }
 
-    fun setupTimer(petScreenBinding: ActivityPetScreenBinding, getHour: String, getMin: String, getSec: String)
+    fun setTo0IfEmpty(string: String): String
+    {
+        if (string.isEmpty())
+            return "0"
+
+        return string
+    }
+
+    // ----- UI related stuff, nothing related to starting the timer
+    fun setupTimer()
+    {
+        petScreenBinding.timerBtn0.backgroundTintList = this.resources.getColorStateList(R.color.timer_button_color, this.theme)
+        petScreenBinding.timerBtn1.backgroundTintList = this.resources.getColorStateList(R.color.timer_button_color, this.theme)
+
+        petScreenBinding.timerBtn0.isEnabled = false
+
+        // ----- TO DO, restrict input / input filter for timer (max 12 hours, etc)
+        // ----- We need to store the ids because of the setOnClickListener algorithm
+        // ex. We cannot assume that "timerHrsinputEt" will always be present since we will be deleting it later on
+        timerIds[0] = petScreenBinding.timerHrsinputEt.id
+        timerIds[1] = petScreenBinding.timerMinsinputEt.id
+        timerIds[2] = petScreenBinding.timerSecinputEt.id
+
+        // ----- Cancel button; Change TextViews to EditText
+        petScreenBinding.timerBtn0.setOnClickListener{
+            // cancel
+            cancelTimer(petScreenBinding)
+        }
+
+        // If timer start button is clicked, change EditText to TextViews
+        petScreenBinding.timerBtn1.setOnClickListener{
+            var getHour = findViewById<EditText>(timerIds[0]).text.toString()
+            var getMin = findViewById<EditText>(timerIds[1]).text.toString()
+            var getSec = findViewById<EditText>(timerIds[2]).text.toString()
+
+            // helper function so it's less cumbersome to input for hour, min, and sec :)
+            getHour = setTo0IfEmpty(getHour)
+            getMin = setTo0IfEmpty(getMin)
+            getSec = setTo0IfEmpty(getSec)
+
+            // 00:00:00
+            if (getHour.toInt() == 0 &&  getMin.toInt() == 0 && getSec.toInt() == 0)
+                Toast.makeText(this, "Cannot set timer to 0h 0m 0s.", Toast.LENGTH_SHORT).show()
+            else if (getMin.toInt() < 0 || getMin.toInt() > 59 )
+                Toast.makeText(this, "Minutes must be in range of 0 to 59.", Toast.LENGTH_SHORT).show()
+            else if (getSec.toInt() < 0 || getSec.toInt() > 59 )
+                Toast.makeText(this, "Seconds must be in range of 0 to 59.", Toast.LENGTH_SHORT).show()
+            // start timer
+            else
+                startTimer(petScreenBinding, getHour, getMin, getSec)
+
+        }
+    }
+
+    // ----- Since most of our variables are ints, we can use this to update to not repeatedly declare sp/editor
+    fun updateIntFile(file_part: String, num: Int)
+    {
+        val sp = getSharedPreferences(PetScreenActivity.FILE_PET, MODE_PRIVATE)
+        val editor = sp.edit()
+
+        editor.putInt(file_part, num)
+        editor.apply()
+
+    }
+
+
+    fun startTimer(petScreenBinding: ActivityPetScreenBinding, getHour: String, getMin: String, getSec: String)
     {
         // ----- This part deletes edit texts [inputs] and replaces it with the text view of the timer
         // NOTE: we don't store the ids here, only in cancelTimer when editTexts are involved
@@ -305,13 +391,27 @@ class PetScreenActivity : AppCompatActivity() {
     // ----- Just a thread to make the pet move/animate
     fun petAnimationStart()
     {
-        // run pet animation
-        Thread {
-            handler.post{
-                animationDrawable.start()
-            }
-        }.start()
+        animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
 
+        // run pet animation
+        handler.post{
+            animationDrawable.start()
+        }
+
+
+    }
+
+    fun petAnimationStopAndStartNewLooper()
+    {
+        // stop animation
+        handlerThread.quit()
+
+        // because we quit the thread, the looper does not exist anymore
+        // we need to instantiate a new one
+        handlerThread = HandlerThread("AnimationThread").apply {
+            start()
+        }
+        handler = Handler(handlerThread.looper)
     }
 
     // ----- Set the right animation for current pet and evolution
@@ -338,23 +438,65 @@ class PetScreenActivity : AppCompatActivity() {
 
     }
 
-    private fun initRestorePetInfo(name: String, curExp: Int, maxExp: Int, level: Int, imagePet: ImageView, petScreenBinding: ActivityPetScreenBinding){
+    private fun initRestorePetInfo(){
         // Retrieve Information
-        // TO DO: Should use the local storage to retrieve all pet details of the player. (For MCO2, it's okay if not implemented yet)
+        val sp = getSharedPreferences(PetScreenActivity.FILE_PET, MODE_PRIVATE)
+
+        // local variables
+        loggedUsername = sp.getString(PetScreenActivity.USERNAME, "").toString() // local variable
+        curPetType = sp.getInt(PetScreenActivity.PET_TYPE, -1) //
+        curPetEvol = sp.getInt(PetScreenActivity.PET_EVOL, -1)
+        petName = sp.getString(PetScreenActivity.PET_NAME, "").toString()
+
+        val petLevel = sp.getInt(PetScreenActivity.PET_LEVEL, -1)
+        val petExp = sp.getInt(PetScreenActivity.PET_EXP, -1)
+        val petMaxExp = sp.getInt(PetScreenActivity.PET_MAX_EXP, -1)
+
 
         // Change details on screen to display current progress of the pet
         //petScreenBinding.imgPet.
-        petScreenBinding.txtPetName.text = name // Pet Name
-        petScreenBinding.txtLevel.text = "Level " + level.toString() // Pet Level
+        petScreenBinding.txtPetName.text = petName // Pet Name
+        petScreenBinding.txtLevel.text = "Level " + petLevel.toString() // Pet Level
 
         // Experience Bar
         // Note: Always set the Max before the Progress. It matters.
-        petScreenBinding.progressbarExp.max = maxExp // Maximum Exp to level up
-        petScreenBinding.progressbarExp.progress = curExp // Current Exp
+        petScreenBinding.progressbarExp.max = petMaxExp // Maximum Exp to level up
+        petScreenBinding.progressbarExp.progress = petExp // Current Exp
+
+        // DEBUG for exp
+        Log.d("CurrentPetExp", petExp.toString())
 
     }
 
-    fun updatePetExp(hour: Long, min: Long, seconds: Long, petScreenBinding: ActivityPetScreenBinding){
+    fun calculateIfLevelUp(earnedExp: Double, curExp: Int, maxExp: Int, curLvl: CharSequence)
+    {
+        // If earned exp is over the maximum experience points, level up pet and add the remaining earned exp
+        if ( (earnedExp + curExp.toLong()) >= maxExp.toLong() ){
+            Toast.makeText(this, "Congratulations! $petName leveled up.", Toast.LENGTH_LONG).show()
+
+            // Compute for remaining exp
+            // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
+            val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
+            this.remainingExp = remainingExp
+
+            // Since curLvl is a string, find the numbers in the string then use the number
+            val extractedLvl = curLvl.filter { it.isDigit() }.toString()
+            this.extractedLvl = extractedLvl
+
+            // Ask if single or double level up
+            val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
+            intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
+            levelUpActivityLauncher.launch(intent)
+
+        } else {
+            // Add Earned Exp to Current Exp
+            val exp = (earnedExp + curExp).roundToInt()
+            petScreenBinding.progressbarExp.progress = exp
+            updateIntFile(PetScreenActivity.PET_EXP, exp)
+        }
+    }
+
+    fun updatePetExp(hour: Long, min: Long, seconds: Long){
         // Max. Experience per Level
         // Lv1 : 1000
         // Lv2 : 2000
@@ -380,89 +522,28 @@ class PetScreenActivity : AppCompatActivity() {
         var earnedExp = 0.0
         var levelScalar = 0
 
-        // Initialize Global Variables
-        this.petScreenBinding = petScreenBinding
-
         if ( hour != 0.toLong() ){
             // Compute Exp
             earnedExp = ((hour * 3600) * 0.5)
 
-            // If earned exp is over the maximum experience points, level up pet and add the remaining earned exp
-            if ( (earnedExp + curExp.toLong()) >= maxExp.toLong() ){
-                Toast.makeText(this, "Congratulations! Pet leveled up.", Toast.LENGTH_LONG).show()
 
-                // Compute for remaining exp
-                // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
-                val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
-                this.remainingExp = remainingExp
-
-                // Since curLvl is a string, find the numbers in the string then use the number
-                val extractedLvl = curLvl.filter { it.isDigit() }.toString()
-                this.extractedLvl = extractedLvl
-
-                // Ask if single or double level up
-                val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
-                intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
-                levelUpActivityLauncher.launch(intent)
-
-            } else {
-                // Add Earned Exp to Current Exp
-                petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
-            }
         } else if ( min != 0.toLong() ){
             // Compute Exp
             earnedExp = ((min * 60) * 0.5)
-            // If earned exp is over the maximum experience points, level up pet and add the remaining earned exp
-            if ( (earnedExp + curExp.toLong() ) >= maxExp.toLong() ){
-                Toast.makeText(this, "Congratulations! Pet leveled up.", Toast.LENGTH_LONG).show()
 
-                // Compute for remaining exp
-                // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
-                val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
-                this.remainingExp = remainingExp
-
-                // Since curLvl is a string, find the numbers in the string then use the number
-                val extractedLvl = curLvl.filter { it.isDigit() }.toString()
-                this.extractedLvl = extractedLvl
-
-                // Ask if single or double level up
-                val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
-                intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
-                levelUpActivityLauncher.launch(intent)
-            } else {
-                // Add Earned Exp to Current Exp
-                petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
-            }
 
         } else if ( seconds != 0.toLong() ){
             // Compute Exp
             earnedExp = seconds * 0.5
-            // If current exp is over the maximum experience points, level up pet and add the remaining earned exp
-            if ( (earnedExp + curExp.toLong() ) >= maxExp.toLong() ){
-                Toast.makeText(this, "Congratulations! Pet leveled up.", Toast.LENGTH_LONG).show()
 
-                // Compute for remaining exp
-                // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
-                val remainingExp = (maxExp.toLong() - (earnedExp + curExp.toLong())).absoluteValue
-                this.remainingExp = remainingExp
-
-                // Since curLvl is a string, find the numbers in the string then use the number
-                val extractedLvl = curLvl.filter { it.isDigit() }.toString()
-                this.extractedLvl = extractedLvl
-
-                // Ask if single or double level up
-                val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
-                intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
-                levelUpActivityLauncher.launch(intent)
-
-            } else {
-                // Add Earned Exp to Current Exp
-                petScreenBinding.progressbarExp.progress = (earnedExp + curExp).roundToInt()
-            }
         }
+
+        calculateIfLevelUp(earnedExp, curExp, maxExp, curLvl)
 
         Toast.makeText(this, "Earned $earnedExp Exp Points!", Toast.LENGTH_LONG).show()
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -470,65 +551,47 @@ class PetScreenActivity : AppCompatActivity() {
 
         // ViewBind activity_pet_screen.xml
         val petScreenBinding: ActivityPetScreenBinding = ActivityPetScreenBinding.inflate(layoutInflater)
+
+        // Initialize Global Variables
+        this.petScreenBinding = petScreenBinding
+
         // Change the scene
         setContentView(petScreenBinding.root)
 
-        // Get Username, Pet Name, and Pet Type
-        val loggedUsername = intent.getStringExtra(RegisterActivity.USERNAME)
-        val petName = intent.getStringExtra(PetScreenActivity.PET_NAME)
-        val petType = intent.getIntExtra(PetScreenActivity.PET_TYPE, -1)
-        val petEvol = intent.getIntExtra(PetScreenActivity.EVOL, -1)
+        /* ================
+              LOAD DATA
+          ================
+        */
 
-        curPetType = petType
+        initRestorePetInfo()
+
 
         // Display a toast welcoming the user
         Toast.makeText(this, "Welcome to PomoPet, $loggedUsername!", Toast.LENGTH_SHORT).show()
 
-        // Lines 26 to 33 is for testing purposes. You may delete it or comment it out.
         // Test Activity View Exercise (Delete this after)
         //val viewExerciseTemplateIntentActivity = Intent(applicationContext, ViewExerciseActivity::class.java)
 
-        petScreenBinding.timerBtn0.backgroundTintList = this.resources.getColorStateList(R.color.timer_button_color, this.theme)
-        petScreenBinding.timerBtn1.backgroundTintList = this.resources.getColorStateList(R.color.timer_button_color, this.theme)
 
-        petScreenBinding.timerBtn0.isEnabled = false
+        // ----- Set the correct animation for the pet
+        petTypeSet(petScreenBinding.imgPet, curPetType, curPetEvol)
 
-        // ----- TO DO, restrict input / input filter for timer (max 12 hours, etc)
-        // ----- We need to store the ids because of the setOnClickListener algorithm
-        // ex. We cannot assume that "timerHrsinputEt" will always be present since we will be deleting it later on
-        timerIds[0] = petScreenBinding.timerHrsinputEt.id
-        timerIds[1] = petScreenBinding.timerMinsinputEt.id
-        timerIds[2] = petScreenBinding.timerSecinputEt.id
+        // ----- Run animation
 
-        // ----- Cancel button; Change TextViews to EditText
-        petScreenBinding.timerBtn0.setOnClickListener{
-            // cancel
-            cancelTimer(petScreenBinding)
-        }
+        petAnimationStart()
 
-        // If timer start button is clicked, change EditText to TextViews
-        petScreenBinding.timerBtn1.setOnClickListener{
-            var getHour = findViewById<EditText>(timerIds[0]).text.toString()
-            var getMin = findViewById<EditText>(timerIds[1]).text.toString()
-            var getSec = findViewById<EditText>(timerIds[2]).text.toString()
+        // ----- Set values for pet details
+        petScreenBinding.txtUsername.text = loggedUsername
 
-            if (getHour.isEmpty())
-                Toast.makeText(this, "Missing number of hours.", Toast.LENGTH_SHORT).show()
-            else if (getMin.isEmpty())
-                Toast.makeText(this, "Missing number of minutes.", Toast.LENGTH_SHORT).show()
-            else if (getSec.isEmpty())
-                Toast.makeText(this, "Missing number of seconds.", Toast.LENGTH_SHORT).show()
-            else if (getMin.toString().toInt() < 0 || getMin.toString().toInt() > 59 )
-                Toast.makeText(this, "Minutes must be in range of 0 to 59.", Toast.LENGTH_SHORT).show()
-            else if (getSec.toString().toInt() < 0 || getSec.toString().toInt() > 59 )
-                Toast.makeText(this, "Seconds must be in range of 0 to 59.", Toast.LENGTH_SHORT).show()
-            else if (getHour.toString().toInt() == 0 && getMin.toString().toInt() == 0 && getSec.toString().toInt() == 0)
-                Toast.makeText(this, "Cannot set timer to 0h 0m 0s.", Toast.LENGTH_SHORT).show()
-            // start timer
-            else
-                setupTimer(petScreenBinding, getHour, getMin, getSec)
 
-        }
+
+        /* ================
+                LISTENERS
+           ================
+         */
+
+        // ----- Timer UI setups
+        setupTimer() // UI and listener setups
 
         // ----- Pet Archive Button
         petScreenBinding.petArchiveLl.setOnClickListener{
@@ -571,21 +634,10 @@ class PetScreenActivity : AppCompatActivity() {
             builder.show()
         }
 
-        // ----- Set the correct animation for the pet
-        petTypeSet(petScreenBinding.imgPet, petType, petEvol)
-
-        // ----- Run animation
-        animationDrawable = petScreenBinding.imgPet.drawable as AnimationDrawable
-        petAnimationStart()
-
-        // ----- Set values for pet details
-        petScreenBinding.txtUsername.text = loggedUsername
-        initRestorePetInfo(petName.toString(), 999, 1000, 1, petScreenBinding.imgPet, petScreenBinding)
-
         // Inventory screen
         petScreenBinding.petInventoryLl.setOnClickListener{
             val intent = Intent(this, InventoryActivity::class.java)
-            intent.putExtra(EVOL, petEvol)
+            intent.putExtra(PET_EVOL, curPetEvol)
             intent.putExtra(PET_TYPE, curPetType)
             intent.putExtra(PET_NAME, petName)
             this.startActivity(intent)
@@ -603,22 +655,21 @@ class PetScreenActivity : AppCompatActivity() {
             this.startActivity(intent)
         }
 
-    }
 
-    override fun onStop() {
-        super.onStop()
-        handlerThread.quit()
+
+
+
+
     }
 
     override fun onResume() {
         super.onResume()
-        petAnimationStart()
     }
 
     // ----- This is to stop the threads prior to finishing the activity
     override fun onDestroy() {
         super.onDestroy()
-        animationDrawable.stop()
+        handlerThread.quit()
         handler.removeCallbacksAndMessages(null)
     }
 }
