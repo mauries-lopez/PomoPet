@@ -20,6 +20,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginTop
 import androidx.core.view.setMargins
 import androidx.core.view.setPadding
@@ -27,15 +29,26 @@ import com.example.pomopet.databinding.ActivityNewEggBinding
 
 class NewEggActivity : AppCompatActivity() {
 
-    lateinit var animationDrawablePet: AnimationDrawable
-    lateinit var animationDrawableHand: AnimationDrawable
+    private lateinit var pomoDBHelper: PomoDBHelper
+    private lateinit var animationDrawablePet: AnimationDrawable
+    private lateinit var animationDrawableHand: AnimationDrawable
 
-    var handlerThread = HandlerThread("AnimationThread").apply {start()}
-    var handler = Handler(handlerThread.looper)
+    private var handlerThread = HandlerThread("AnimationThread").apply {start()}
+    private var handler = Handler(handlerThread.looper)
 
 
-    fun instantiateRandomPetImageView(petChosen : Int): ImageView {
-        val petHatchedImage = ImageView(this);
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+
+    private fun instantiateRandomPetImageView(petChosen : Int): ImageView {
+        val petHatchedImage = ImageView(this)
         val linearLayoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -52,7 +65,7 @@ class NewEggActivity : AppCompatActivity() {
 
         return petHatchedImage
     }
-    fun instantiateCongratsText(): TextView {
+    private fun instantiateCongratsText(): TextView {
         // ----- More dynamic adding of views
         val congratsText = TextView(this)
         congratsText.text = resources.getText(R.string.congrats)
@@ -69,7 +82,7 @@ class NewEggActivity : AppCompatActivity() {
         return congratsText
     }
 
-    fun instantiateNameYourPetText():TextView {
+    private fun instantiateNameYourPetText():TextView {
         val namePetText = TextView(this)
         namePetText.text = resources.getText(R.string.name_your_pet)
         val linearLayoutParams = LinearLayout.LayoutParams(
@@ -83,7 +96,7 @@ class NewEggActivity : AppCompatActivity() {
         return namePetText
     }
 
-    fun instantiatePetNameEditText(): EditText{
+    private fun instantiatePetNameEditText(): EditText{
         val petNameEditText = EditText(this)
         petNameEditText.hint = "Name"
         petNameEditText.setEms(10)
@@ -94,7 +107,7 @@ class NewEggActivity : AppCompatActivity() {
         petNameEditText.textAlignment = TEXT_ALIGNMENT_CENTER
         return petNameEditText
     }
-    fun instantiatePetNameSubmitButton(): Button{
+    private fun instantiatePetNameSubmitButton(): Button{
         val petNameSubmitButton = Button(this)
         petNameSubmitButton.gravity = Gravity.CENTER
         petNameSubmitButton.text = resources.getText(R.string.submit)
@@ -115,25 +128,25 @@ class NewEggActivity : AppCompatActivity() {
 
     // ----- DEBUG for level/exp related purposes
 
-    fun saveDetails(username: String, petName: String, petChosen: Int) {
-        val sp = getSharedPreferences(PetScreenActivity.FILE_PET, MODE_PRIVATE)
-        val editor = sp.edit()
+    private fun saveDetails(username: String, petName: String, petChosen: Int) {
 
-        editor.putString(PetScreenActivity.USERNAME, username)
-        editor.putString(PetScreenActivity.PET_NAME, petName)
-        editor.putInt(PetScreenActivity.PET_TYPE, petChosen)
-        editor.putBoolean(PetScreenActivity.HAS_REGISTERED, true)
-        editor.putInt(PetScreenActivity.PET_LEVEL, 1)
-        editor.putInt(PetScreenActivity.PET_EXP, 0)
-        editor.putInt(PetScreenActivity.PET_MAX_EXP, 1000)
-        editor.putInt(PetScreenActivity.PET_EVOL, 1)
+        val newPomoPet = PomoModel(
+            username,
+            petName,
+            petChosen,
+            1,
+            1,
+            0,
+            1000,
+        )
 
-        editor.apply()
+        pomoDBHelper = PomoDBHelper.getInstance(this@NewEggActivity)!!
+        pomoDBHelper.insertNewPet(newPomoPet)
 
     }
 
 
-    fun addViewsAfterHatchedEgg(actNewEggActivity: ActivityNewEggBinding )
+    private fun addViewsAfterHatchedEgg(actNewEggActivity: ActivityNewEggBinding )
     {
         // Randomize pet
         val petChosen = (0..2).random()
@@ -222,6 +235,13 @@ class NewEggActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
+
     // ----- Stop animation threads
     override fun onDestroy() {
         super.onDestroy()
