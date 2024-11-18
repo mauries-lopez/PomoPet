@@ -60,6 +60,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        hideSystemBars()
 
         // Register sensors
         val accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -125,10 +126,6 @@ class ChosenExerciseActivity : AppCompatActivity() {
             }
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemBars()
-    }
+    
 
 }
