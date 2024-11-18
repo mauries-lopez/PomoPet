@@ -3,6 +3,8 @@ package com.example.pomopet
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
@@ -18,6 +20,16 @@ class SettingsActivity : AppCompatActivity() {
 
         val pomodoro_set_array = arrayOf(1, 2, 3, 4, 5)
         val break_duration_array = arrayOf(5, 10, 15, 20, 25, 30)
+    }
+
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,4 +121,10 @@ class SettingsActivity : AppCompatActivity() {
             Toast.makeText(this, "Successfully saved settings!", Toast.LENGTH_SHORT).show()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 }

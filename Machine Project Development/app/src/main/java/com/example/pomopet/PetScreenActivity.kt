@@ -22,6 +22,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.SettingsActivity.Companion.FILE_SETTINGS
 import com.example.pomopet.SettingsActivity.Companion.POMODOROS_SETTINGS
 import com.example.pomopet.SettingsActivity.Companion.POMO_BREAK_DURATION_SETTINGS
@@ -147,6 +149,16 @@ class PetScreenActivity : AppCompatActivity() {
                     breakThreadStart(remainingMillisTimer)
             }
         }
+    }
+
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
     private fun changeTimerToEditText(){
@@ -864,6 +876,12 @@ class PetScreenActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 
     // ----- This is to stop the threads prior to finishing the activity
     override fun onDestroy() {

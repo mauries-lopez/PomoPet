@@ -20,6 +20,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginTop
 import androidx.core.view.setMargins
 import androidx.core.view.setPadding
@@ -34,6 +36,16 @@ class NewEggActivity : AppCompatActivity() {
     private var handlerThread = HandlerThread("AnimationThread").apply {start()}
     private var handler = Handler(handlerThread.looper)
 
+
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
 
     private fun instantiateRandomPetImageView(petChosen : Int): ImageView {
         val petHatchedImage = ImageView(this)
@@ -223,6 +235,13 @@ class NewEggActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
+
     // ----- Stop animation threads
     override fun onDestroy() {
         super.onDestroy()

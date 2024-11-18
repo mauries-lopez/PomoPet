@@ -7,6 +7,8 @@ import android.os.CountDownTimer
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ActivityPetLevelUpBinding
 
 class PetLevelUpActivity : AppCompatActivity() {
@@ -15,6 +17,16 @@ class PetLevelUpActivity : AppCompatActivity() {
 
     companion object {
         const val RESULT_KEY = "RESULT_KEY"
+    }
+
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,4 +85,10 @@ class PetLevelUpActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 }

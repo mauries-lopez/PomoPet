@@ -1,10 +1,15 @@
 package com.example.pomopet
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ActivityTitleScreenBinding
 
 
@@ -12,9 +17,20 @@ import com.example.pomopet.databinding.ActivityTitleScreenBinding
 class MainActivity : AppCompatActivity() {
     private lateinit var pomoDBHelper: PomoDBHelper
 
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
 
         // Start application by going to the Title Screen
         // ViewBind activity_title_screen.xml
@@ -50,4 +66,11 @@ class MainActivity : AppCompatActivity() {
             this.finish()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
+
 }

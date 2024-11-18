@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ActivityInventoryBinding
 
 class InventoryActivity : AppCompatActivity() {
@@ -16,6 +18,15 @@ class InventoryActivity : AppCompatActivity() {
     var item2Image = -1
     var item3Image = -1
 
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
 
     // ----- Just an organized way to set inventories
     fun setRedPetInventory(evol: Int)
@@ -148,4 +159,10 @@ class InventoryActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 }

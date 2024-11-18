@@ -5,12 +5,24 @@ import android.os.Bundle
 import android.util.Log
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ChosenExerciseBinding
 
 class ChosenExerciseActivity : AppCompatActivity() {
 
     //Initialize chosen record
     private lateinit var viewBinding : ChosenExerciseBinding
+
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,4 +50,10 @@ class ChosenExerciseActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 }
