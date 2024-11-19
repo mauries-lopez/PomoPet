@@ -59,6 +59,11 @@ class ChosenExerciseActivity : AppCompatActivity() {
         val webView = WebView(this)
         webView.clearCache(true)
 
+        // Reset variables
+        exerCount = 0
+        levelScalar = 0
+        lastIncrementTime = 0
+
         // Get the exercise details from intent
         currentExercise = intent.getStringExtra("EXER_NAME") ?: "Unknown Exercise"
 
@@ -76,8 +81,16 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
         // If the user does not want to finish/perform the exercise
         viewBinding.finishBtn.setOnClickListener {
-            levelScalar = 1
-            finishExer()
+            // Reset variables
+            exerCount = 0
+            levelScalar = 0
+            lastIncrementTime = 0
+
+            // Send single level-up result
+            val intent = Intent()
+            intent.putExtra("LEVEL_SCALAR", 1)  // Indicate single level-up (x1 bonus)
+            setResult(RESULT_OK, intent)
+            finish()
         }
     }
 
@@ -89,9 +102,18 @@ class ChosenExerciseActivity : AppCompatActivity() {
         val accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
+        if (accelerometerSensor == null) {
+            Log.e("SensorStatus", "Accelerometer not available!")
+        }
+        if (gyroscopeSensor == null) {
+            Log.e("SensorStatus", "Gyroscope not available!")
+        }
+
         sensorEventListener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
                 if (event != null) {
+                    Log.d("CurrentExercise", "Exercise selected: $currentExercise")
+                    Log.d("RawSensorData", "Sensor: ${event.sensor.name}, x: ${event.values[0]}, y: ${event.values[1]}, z: ${event.values[2]}")
                     when (event.sensor.type) {
                         // For squats and jumping jacks for linear movement
                         Sensor.TYPE_ACCELEROMETER -> {
@@ -122,7 +144,6 @@ class ChosenExerciseActivity : AppCompatActivity() {
         sensorManager.registerListener(sensorEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI)
     }
 
-
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(sensorEventListener)
@@ -130,12 +151,15 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
     private fun determineExercise(currentExercise: String?, x: Float, y: Float, z: Float, isGyroscope: Boolean = false) {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastIncrementTime < 500000) return // Ignore if within 500ms
+        if (currentTime - lastIncrementTime < 50000) return // Ignore if within 50000ms
+
+        Log.d("ExerciseDebug", "currentExercise: $currentExercise, x: $x, y: $y, z: $z, isGyroscope: $isGyroscope")
 
         when (currentExercise) {
             "Jumping Jacks" -> {
-                if (!isGyroscope && z > 9) { // Use accelerometer for Jumping Jacks
+                if (!isGyroscope && z > 10) { // Use accelerometer for Jumping Jacks
                     Log.d("SensorData", "x: $x, y: $y, z: $z")
+                    levelScalar = 1
                     exerCount++
                     updateExerciseCounter(exerCount)
 
@@ -146,15 +170,13 @@ class ChosenExerciseActivity : AppCompatActivity() {
                     }
                 }
             }
+            // Works
             "Squats" -> {
                 if (!isGyroscope) { // Use accelerometer for Squats
-                    /*if (y < -5) {
-                        // Squat down logic
-                        // is this needed? what if we count nalang the times the user squats up?
-                    }*/
-                    if (y > 9) {
+                    if (y > 10) {
                         // Squat up logic
-                        Log.d("SensorData", "x: $x, y: $y, z: $z")
+
+                        levelScalar = 1
                         exerCount++
                         updateExerciseCounter(exerCount)
 
@@ -166,10 +188,12 @@ class ChosenExerciseActivity : AppCompatActivity() {
                     }
                 }
             }
+            // Works when you move the phone, pero rotate ???
             "Lunges" -> {
                 if (isGyroscope) { // Use gyroscope for Lunges
-                    if (x > 9 || x < -9) {
-                        Log.d("SensorData", "x: $x, y: $y, z: $z")
+                    if (x > 6 || x < -6) {
+
+                        levelScalar = 1
                         exerCount++
                         updateExerciseCounter(exerCount)
 
@@ -184,20 +208,28 @@ class ChosenExerciseActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateExerciseCounter(count: Int) {
-        Log.d("ChosenExerciseActivity", "Repetition count updated: $count")
-        runOnUiThread {
-            viewBinding.exerCounter.text = "Repetitions: $count"
-        }
+    private fun updateExerciseCounter(exerCount: Int) {
+        Log.d("ChosenExerciseActivity", "Repetition count updated: $exerCount") // not being logged
+
+        viewBinding.exerCounter.text = "Repetitions: $exerCount"
+
     }
 
     private fun finishExer(){
         Toast.makeText(this, "EXERCISE FINISHED!", Toast.LENGTH_SHORT).show()
 
+        Log.d("ChosenExerciseActivity", "LevelScalar Value: $levelScalar")
+
         // Send the repetitions count back to the calling activity
-        val returnIntent = Intent()
-        returnIntent.putExtra("LEVEL_SCALAR", levelScalar)  // Pass level-up scalar (1 for single, 2 for double)
-        setResult(RESULT_OK, returnIntent)
+        val intent = Intent()
+        intent.putExtra("LEVEL_SCALAR", 2)  // Indicate double level-up (x2 bonus)
+        setResult(RESULT_OK, intent)
+
+        // Reset variables
+        exerCount = 0
+        levelScalar = 0
+        lastIncrementTime = 0
+
         finish()
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -53,6 +54,22 @@ class PetLevelUpActivity : AppCompatActivity() {
             finish()
         }
 
+        val exerciseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && intent.getIntExtra("LEVEL_SCALAR", 0) == 2) {
+                // The user completed the exercise; grant x2 level up
+                val returnIntent = Intent()
+                returnIntent.putExtra("LEVEL_SCALAR", 2) // Double Level Up
+                setResult(RESULT_OK, returnIntent)
+                finish() // End PetLevelUpActivity
+            } else {
+                // The user exited the exercise early; grant x1 level up
+                val returnIntent = Intent()
+                returnIntent.putExtra("LEVEL_SCALAR", 1) // Single Level Up
+                setResult(RESULT_OK, returnIntent)
+                finish() // End PetLevelUpActivity
+            }
+        }
+
         // Single Level Up
         petLevelUpActivityBind.levelUpOneBtn.setOnClickListener {
             Toast.makeText(this, "SINGLE LEVEL UP !!", Toast.LENGTH_SHORT).show()
@@ -68,7 +85,6 @@ class PetLevelUpActivity : AppCompatActivity() {
             val randomItem = ExerciseDataSet.loadData().shuffled().first()
 
             Toast.makeText(this, "DOUBLE LEVEL UP !!", Toast.LENGTH_SHORT).show()
-            scalar = 2
 
             // Start ChosenExerciseActivity and pass the individual properties
             val intent = Intent(this, ChosenExerciseActivity::class.java)
@@ -76,9 +92,7 @@ class PetLevelUpActivity : AppCompatActivity() {
             intent.putExtra("EXER_ICON", randomItem.exerIcon)
             intent.putExtra("EXER_VID", randomItem.exerVid)
             intent.putExtra("EXER_DESC", randomItem.exerDesc)
-            startActivity(intent)
-
-            finish()
+            exerciseLauncher.launch(intent)
         }
     }
 

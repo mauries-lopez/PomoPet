@@ -50,7 +50,7 @@
                 android:layout_marginStart="105dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
-                android:text="TextView"
+                android:text="Repetitions: 0"
                 android:textSize="34sp"
                 app:layout_constraintBottom_toTopOf="@+id/chosenVid"
                 app:layout_constraintStart_toStartOf="parent"

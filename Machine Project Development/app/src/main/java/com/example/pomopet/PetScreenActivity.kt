@@ -95,6 +95,8 @@ class PetScreenActivity : AppCompatActivity() {
 
             val levelScalar = result.data!!.getIntExtra("LEVEL_SCALAR", 0)
 
+            Log.d("PetScreenActivity", "LevelScalar: $levelScalar")
+
             // Level up logic
             val updatedLvl = (extractedLvl.toIntOrNull()?.plus(levelScalar))
             petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
