@@ -739,14 +739,16 @@ class PetScreenActivity : AppCompatActivity() {
 
 
         } else if (seconds != 0.toLong()) {
-            // Compute Exp // Original value : 0.5, modify ko muna for testing purposes
-            earnedExp = seconds * 1000.0
+            // Compute Exp
+            earnedExp = seconds * 0.5
 
         }
 
         calculateIfLevelUp(earnedExp, curExp, maxExp, curLvl)
 
+
         Toast.makeText(this, "Earned $earnedExp Exp Points!", Toast.LENGTH_LONG).show()
+
     }
 
     fun loadSettings()
