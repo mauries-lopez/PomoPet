@@ -254,9 +254,10 @@
                 android:id="@+id/petArchive_ll"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="1.5"
                 android:clickable="true"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="10dp">
 
                 <ImageView
                     android:id="@+id/petArchive_btn"
@@ -281,7 +282,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:clickable="true"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="10dp">
 
                 <ImageView
                     android:id="@+id/petInv_btn"
@@ -304,9 +306,10 @@
                 android:id="@+id/exercise_ll"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:clickable="true"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="10dp">
 
                 <ImageView
                     android:id="@+id/imageView7"
