@@ -95,6 +95,8 @@ class PomoDBHelper(context: Context) : SQLiteOpenHelper(context, DatabaseRef.DAT
         values.put(DatabaseRef.COLUMN_NAME_PET_EVOL, pomoModel.pet_evol)
         values.put(DatabaseRef.COLUMN_NAME_PET_EXP, pomoModel.pet_exp)
         values.put(DatabaseRef.COLUMN_NAME_PET_MAX_EXP, pomoModel.pet_max_exp)
+        values.put(DatabaseRef.COLUMN_NAME_REMAINING_EXP, pomoModel.remaining_exp)
+        values.put(DatabaseRef.COLUMN_NAME_EXTRACTED_LVL, pomoModel.extracted_lvl)
 
         val rowsUpdated = database.update(DatabaseRef.TABLE_NAME, values, DatabaseRef._ID + "= ?", arrayOf(pomoModel.id.toString()))
         database.close()

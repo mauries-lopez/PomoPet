@@ -68,6 +68,7 @@ class PetScreenActivity : AppCompatActivity() {
     private var extractedLvl: String = ""
     private var remainingExp: Double = 0.0
     private lateinit var levelUpTextView: TextView
+    private var isLevelUpUIExists = false
 
     // timer variables
     private var remainingMillisTimer = 0L
@@ -110,10 +111,16 @@ class PetScreenActivity : AppCompatActivity() {
 
             petScreenBinding.progressbarExp.progress = 0 // Reset Exp. Bar
 
+            if (levelScalar == 1)
+                Toast.makeText(this, "x1 Level up!", Toast.LENGTH_SHORT).show()
+
+            else if (levelScalar == 2)
+                Toast.makeText(this, "Congratulations! x2 Level up!", Toast.LENGTH_SHORT).show()
+
 
             // Check if pet needs to be evolved
             if (updatedLvl >= 10 && currentPet.pet_evol == 1) {
-                Toast.makeText(this, "Congratulations! ${currentPet.pet_name} evolved to the 1st Evolution" , Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Congratulations! ${currentPet.pet_name} evolved to the 1st Evolution!" , Toast.LENGTH_LONG).show()
                 Log.d("PetScreenActivity", PET_TYPE)
                 petTypeSet(petScreenBinding.imgPet, currentPet.pet_type, 2)
                 currentPet.pet_evol = 2
@@ -123,7 +130,7 @@ class PetScreenActivity : AppCompatActivity() {
             }
             else if (updatedLvl >= 20 && currentPet.pet_evol <= 2)
             {
-                Toast.makeText(this, "Congratulations! ${currentPet.pet_name} evolved to the 2nd Evolution" , Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Congratulations! ${currentPet.pet_name} evolved to the 2nd Evolution!" , Toast.LENGTH_LONG).show()
                 petTypeSet(petScreenBinding.imgPet, currentPet.pet_type, 3)
                 currentPet.pet_evol = 3
 
@@ -303,35 +310,39 @@ class PetScreenActivity : AppCompatActivity() {
 
     private fun makeLevelUpUI()
     {
-        levelUpTextView = TextView(this)
-        levelUpTextView.setLayoutParams(
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                0f
+        if (!isLevelUpUIExists) {
+            isLevelUpUIExists = true
+            levelUpTextView = TextView(this)
+            levelUpTextView.setLayoutParams(
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    0f
+                )
             )
-        )
-        levelUpTextView.setBackgroundColor(Color.parseColor("#E4E0EE"))
-        levelUpTextView.gravity = Gravity.CENTER
-        levelUpTextView.setPadding(5, 5, 5, 5)
-        levelUpTextView.text = resources.getString(R.string.tap_here_to_level_up)
-        levelUpTextView.setTextColor(Color.parseColor("#3C266F"))
-        levelUpTextView.setTypeface(null, Typeface.BOLD)
+            levelUpTextView.setBackgroundColor(Color.parseColor("#E4E0EE"))
+            levelUpTextView.gravity = Gravity.CENTER
+            levelUpTextView.setPadding(5, 5, 5, 5)
+            levelUpTextView.text = resources.getString(R.string.tap_here_to_level_up)
+            levelUpTextView.setTextColor(Color.parseColor("#3C266F"))
+            levelUpTextView.setTypeface(null, Typeface.BOLD)
 
-        levelUpTextView.setOnClickListener{
+            levelUpTextView.setOnClickListener {
 
-            // Ask if single or double level up
-            val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
-            intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
-            levelUpActivityLauncher.launch(intent)
+                // Ask if single or double level up
+                val intent = Intent(applicationContext, PetLevelUpActivity::class.java)
+                intent.putExtra(PET_NAME, petScreenBinding.txtPetName.text.toString())
+                levelUpActivityLauncher.launch(intent)
 
+            }
+            petScreenBinding.layoutMainScreen.addView(levelUpTextView, 5)
         }
-        petScreenBinding.layoutMainScreen.addView(levelUpTextView, 5)
 
     }
 
     private fun removeLevelUpNotif()
     {
+        isLevelUpUIExists = false
         petScreenBinding.layoutMainScreen.removeViewAt(5)
     }
 
@@ -652,8 +663,10 @@ class PetScreenActivity : AppCompatActivity() {
         this.remainingExp = currentPet.remaining_exp.toDouble()
         this.extractedLvl = currentPet.extracted_lvl
 
-        if (currentPet.is_level_up == 1)
+        if (currentPet.is_level_up == 1) {
+            petScreenBinding.progressbarExp.progress =  petScreenBinding.progressbarExp.max
             makeLevelUpUI()
+        }
 
         // DEBUG for exp
         Log.d("CurrentPetExp", currentPet.pet_exp.toString())
@@ -666,7 +679,7 @@ class PetScreenActivity : AppCompatActivity() {
     {
         // If earned exp is over the maximum experience points, level up pet and add the remaining earned exp
         if ( (earnedExp + curExp.toLong()) >= maxExp.toLong() ){
-            Toast.makeText(this, "Congratulations! ${currentPet.pet_name} leveled up.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Congratulations! ${currentPet.pet_name} is ready to level up.", Toast.LENGTH_LONG).show()
 
             // Compute for remaining exp
             // Note: Absolutevalue property is used to make sure that the remaining exp is always a positive value
@@ -679,8 +692,12 @@ class PetScreenActivity : AppCompatActivity() {
             this.extractedLvl = extractedLvl
             currentPet.extracted_lvl = extractedLvl
 
+            petScreenBinding.progressbarExp.progress =  petScreenBinding.progressbarExp.max
+
             // pause timer
             pauseTimer()
+
+
 
             makeLevelUpUI()
 
@@ -697,7 +714,10 @@ class PetScreenActivity : AppCompatActivity() {
             val exp = (earnedExp + curExp).roundToInt()
             petScreenBinding.progressbarExp.progress = exp
             currentPet.pet_exp = exp
+
         }
+
+        pomoDBHelper.savePetExp(currentPet)
     }
 
     fun updatePetExp(hour: Long, min: Long, seconds: Long){
@@ -849,6 +869,7 @@ class PetScreenActivity : AppCompatActivity() {
 
             builder.setPositiveButton(android.R.string.ok) { dialog, which ->
                 //Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
+                hideSystemBars()
             }
             builder.show()
         }

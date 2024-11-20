@@ -72,7 +72,6 @@ class PetLevelUpActivity : AppCompatActivity() {
 
         // Single Level Up
         petLevelUpActivityBind.levelUpOneBtn.setOnClickListener {
-            Toast.makeText(this, "SINGLE LEVEL UP !!", Toast.LENGTH_SHORT).show()
             scalar = 1
             val returnIntent = Intent()
             returnIntent.putExtra("LEVEL_SCALAR", scalar)
@@ -84,7 +83,7 @@ class PetLevelUpActivity : AppCompatActivity() {
             // Select a random item from the ExerciseDataSet
             val randomItem = ExerciseDataSet.loadData().shuffled().first()
 
-            Toast.makeText(this, "DOUBLE LEVEL UP !!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Perform 10 repetitions of the exercise to get x2 Level up!", Toast.LENGTH_SHORT).show()
 
             // Start ChosenExerciseActivity and pass the individual properties
             val intent = Intent(this, ChosenExerciseActivity::class.java)
