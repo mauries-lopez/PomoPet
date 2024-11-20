@@ -93,14 +93,16 @@ class PetScreenActivity : AppCompatActivity() {
     private val levelUpActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK){
 
-            val levelScalar = result.data!!.getIntExtra(PetLevelUpActivity.RESULT_KEY, 0)
+            val levelScalar = result.data!!.getIntExtra("LEVEL_SCALAR", 0)
 
+            Log.d("PetScreenActivity", "LevelScalar: $levelScalar")
+
+            // Level up logic
             val updatedLvl = (extractedLvl.toIntOrNull()?.plus(levelScalar))
             petScreenBinding.txtLevel.text = "Level " + updatedLvl.toString()
             currentPet.pet_level = updatedLvl!!
 
             Log.d("levelUpActivityLauncher", "updatedLvl: " + updatedLvl)
-
 
             val nextMaxExp = petScreenBinding.progressbarExp.max.plus((1000*levelScalar)) // Increase Exp. Bar by 1000
             petScreenBinding.progressbarExp.max = nextMaxExp

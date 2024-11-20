@@ -8,12 +8,18 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
+import android.webkit.WebView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ChosenExerciseBinding
 
 class ChosenExerciseActivity : AppCompatActivity() {
+
+    companion object {
+        const val RESULT_KEY = "RESULT_KEY"
+    }
 
     // Initialize chosen record
     private lateinit var viewBinding: ChosenExerciseBinding
@@ -26,6 +32,14 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
     // Variable to hold the exercise type
     private var currentExercise: String? = null
+
+    // Variable to count number of repetitions
+    private var exerCount = 0
+
+    // Variable to track type of level up
+    private var levelScalar = 0
+
+    private var lastIncrementTime = 0L
 
     private fun hideSystemBars() {
         val controller = WindowInsetsControllerCompat(
@@ -42,6 +56,14 @@ class ChosenExerciseActivity : AppCompatActivity() {
         viewBinding = ChosenExerciseBinding.inflate(layoutInflater) // Inflate the binding
         setContentView(viewBinding.root) // Set the content view to the binding's root
 
+        val webView = WebView(this)
+        webView.clearCache(true)
+
+        // Reset variables
+        exerCount = 0
+        levelScalar = 0
+        lastIncrementTime = 0
+
         // Get the exercise details from intent
         currentExercise = intent.getStringExtra("EXER_NAME") ?: "Unknown Exercise"
 
@@ -56,6 +78,20 @@ class ChosenExerciseActivity : AppCompatActivity() {
         viewBinding.chosenDesc.text = intent.getStringExtra("EXER_DESC") ?: "No Description"
         viewBinding.chosenVid.settings.javaScriptEnabled = true
         viewBinding.chosenVid.loadData(intent.getStringExtra("EXER_VID") ?: "No Video", "text/html", "UTF-8")
+
+        // If the user does not want to finish/perform the exercise
+        viewBinding.finishBtn.setOnClickListener {
+            // Reset variables
+            exerCount = 0
+            levelScalar = 0
+            lastIncrementTime = 0
+
+            // Send single level-up result
+            val intent = Intent()
+            intent.putExtra("LEVEL_SCALAR", 1)  // Indicate single level-up (x1 bonus)
+            setResult(RESULT_OK, intent)
+            finish()
+        }
     }
 
     override fun onResume() {
@@ -66,19 +102,34 @@ class ChosenExerciseActivity : AppCompatActivity() {
         val accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
+        if (accelerometerSensor == null) {
+            Log.e("SensorStatus", "Accelerometer not available!")
+        }
+        if (gyroscopeSensor == null) {
+            Log.e("SensorStatus", "Gyroscope not available!")
+        }
+
         sensorEventListener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
                 if (event != null) {
+                    Log.d("CurrentExercise", "Exercise selected: $currentExercise")
+                    Log.d("RawSensorData", "Sensor: ${event.sensor.name}, x: ${event.values[0]}, y: ${event.values[1]}, z: ${event.values[2]}")
                     when (event.sensor.type) {
+                        // For squats and jumping jacks for linear movement
                         Sensor.TYPE_ACCELEROMETER -> {
-                            // Process accelerometer data based on the exercise type
+                            // Pass accelerometer data to determineExercise
                             val x = event.values[0]
                             val y = event.values[1]
                             val z = event.values[2]
-                            detectExercise(currentExercise, x, y, z)
+                            determineExercise(currentExercise, x, y, z, isGyroscope = false)
                         }
+                        // For lunges exercise to measure rotational movement
                         Sensor.TYPE_GYROSCOPE -> {
-                            // Process gyroscope data if needed (e.g., for lunges)
+                            // Pass gyroscope data to determineExercise if needed
+                            val x = event.values[0]
+                            val y = event.values[1]
+                            val z = event.values[2]
+                            determineExercise(currentExercise, x, y, z, isGyroscope = true)
                         }
                     }
                 }
@@ -98,34 +149,87 @@ class ChosenExerciseActivity : AppCompatActivity() {
         sensorManager.unregisterListener(sensorEventListener)
     }
 
-    private fun detectExercise(currentExercise: String?, x: Float, y: Float, z: Float) {
+    private fun determineExercise(currentExercise: String?, x: Float, y: Float, z: Float, isGyroscope: Boolean = false) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastIncrementTime < 50000) return // Ignore if within 50000ms
+
+        Log.d("ExerciseDebug", "currentExercise: $currentExercise, x: $x, y: $y, z: $z, isGyroscope: $isGyroscope")
+
         when (currentExercise) {
             "Jumping Jacks" -> {
-                // Detect Jumping Jack based on Z-axis movement
-                if (z > 15) {
-                    // Jumping Jack logic
+                if (!isGyroscope && z > 10) { // Use accelerometer for Jumping Jacks
+                    Log.d("SensorData", "x: $x, y: $y, z: $z")
+                    levelScalar = 1
+                    exerCount++
+                    updateExerciseCounter(exerCount)
+
+                    // Finishing the exercise
+                    if (exerCount == 10){
+                        levelScalar = 2
+                        finishExer()
+                    }
                 }
             }
+            // Works
             "Squats" -> {
-                // Detect Squat based on Y-axis movement
-                if (y < -5) {
-                    // Squat down logic
-                }
-                if (y > 5) {
-                    // Squat up logic
+                if (!isGyroscope) { // Use accelerometer for Squats
+                    if (y > 10) {
+                        // Squat up logic
+
+                        levelScalar = 1
+                        exerCount++
+                        updateExerciseCounter(exerCount)
+
+                        // Finishing the exercise
+                        if (exerCount == 10){
+                            levelScalar = 2
+                            finishExer()
+                        }
+                    }
                 }
             }
+            // Works when you move the phone, pero rotate ???
             "Lunges" -> {
-                // Detect Lunge based on X-axis or rotation (Gyroscope)
-                if (x > 5 || x < -5) {
-                    // Lunge detection logic
+                if (isGyroscope) { // Use gyroscope for Lunges
+                    if (x > 6 || x < -6) {
+
+                        levelScalar = 1
+                        exerCount++
+                        updateExerciseCounter(exerCount)
+
+                        // Finishing the exercise
+                        if (exerCount == 10){
+                            levelScalar = 2
+                            finishExer()
+                        }
+                    }
                 }
-            }
-            else -> {
-                // Default or unknown exercise detection
             }
         }
     }
 
+    private fun updateExerciseCounter(exerCount: Int) {
+        Log.d("ChosenExerciseActivity", "Repetition count updated: $exerCount") // not being logged
 
+        viewBinding.exerCounter.text = "Repetitions: $exerCount"
+
+    }
+
+    private fun finishExer(){
+        Toast.makeText(this, "EXERCISE FINISHED!", Toast.LENGTH_SHORT).show()
+
+        Log.d("ChosenExerciseActivity", "LevelScalar Value: $levelScalar")
+
+        // Send the repetitions count back to the calling activity
+        val intent = Intent()
+        intent.putExtra("LEVEL_SCALAR", 2)  // Indicate double level-up (x2 bonus)
+        setResult(RESULT_OK, intent)
+
+        // Reset variables
+        exerCount = 0
+        levelScalar = 0
+        lastIncrementTime = 0
+
+        finish()
+    }
 }
