@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ActivityViewPetArchiveBinding
 
 class ViewPetArchiveActivity : AppCompatActivity() {
@@ -17,6 +18,16 @@ class ViewPetArchiveActivity : AppCompatActivity() {
 
     var handlerThread = HandlerThread("AnimationThread").apply {start()}
     var handler = Handler(handlerThread.looper)
+
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
 
     // ----- Just a thread to make the pet move/animate
     fun petAnimationStart()
@@ -46,6 +57,12 @@ class ViewPetArchiveActivity : AppCompatActivity() {
         }
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 
     override fun onStop() {
         super.onStop()

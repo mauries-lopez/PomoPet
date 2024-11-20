@@ -71,28 +71,93 @@
             android:paddingBottom="20dp">
 
             <TextView
-                android:id="@+id/txt_break_duration"
+                android:id="@+id/txt_pomodoros"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="8"
-                android:text="@string/break_duration" />
+                android:layout_weight="15"
+                android:text="@string/pomodoros_duration" />
 
-            <EditText
-                android:id="@+id/et_break_duration"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:ems="10"
-                android:hint="5"
-                android:inputType="number"
-                android:textAlignment="center" />
-
-            <TextView
-                android:id="@+id/textView6"
+            <ImageButton
+                android:id="@+id/btn_pomo_back"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="min" />
+                android:background="@null"
+                android:rotation="180"
+                android:tint="#5B56AA"
+                app:srcCompat="@android:drawable/ic_media_play" />
+
+            <TextView
+                android:id="@+id/txt_pomodoros_duration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_weight="8"
+                android:background="@drawable/rounded_rectangle"
+                android:padding="5dp"
+                android:text="5"
+                android:textAlignment="center" />
+
+            <ImageButton
+                android:id="@+id/btn_pomo_forward"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:background="@null"
+                android:tint="#5B56AA"
+                app:srcCompat="@android:drawable/ic_media_play" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingLeft="30dp"
+            android:paddingTop="10dp"
+            android:paddingRight="50dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/txt_break_duration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="15"
+                android:text="@string/break_duration" />
+
+            <ImageButton
+                android:id="@+id/btn_break_back"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:background="@null"
+                android:rotation="180"
+                android:tint="#5B56AA"
+                app:srcCompat="@android:drawable/ic_media_play" />
+
+            <TextView
+                android:id="@+id/txt_break_min"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:layout_weight="8"
+                android:background="@drawable/rounded_rectangle"
+                android:padding="5dp"
+                android:text="5"
+                android:textAlignment="center" />
+
+            <ImageButton
+                android:id="@+id/btn_break_forward"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:background="@null"
+                android:tint="#5B56AA"
+                app:srcCompat="@android:drawable/ic_media_play" />
 
         </LinearLayout>
 

@@ -46,6 +46,16 @@
                 android:text="@string/message"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+            <TextView
+                android:id="@+id/txt_msg_x_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="X"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
 
         </LinearLayout>
 
@@ -55,7 +65,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="50dp"
-            android:paddingRight="30dp"
             android:paddingBottom="10dp"
             android:text="@string/level_up_message"
             android:textAlignment="center" />

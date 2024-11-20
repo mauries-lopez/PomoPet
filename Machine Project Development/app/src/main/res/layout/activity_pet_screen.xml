@@ -58,16 +58,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:background="#9A4F3D54"
+            android:background="#3C266E"
             android:padding="10dp"
-            android:text="TextView" />
+            android:text="TextView"
+            android:textColor="#E4E0EE" />
 
         <ImageView
             android:id="@+id/img_pet"
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_weight="6"
-            android:background="#67BDB6C8"
+            android:background="#7F644DA1"
             android:padding="20dp"
             app:srcCompat="@drawable/evol2_red1" />
 
@@ -79,12 +80,13 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="0"
-            android:background="#67BDB6C8"
+            android:background="#3C2670"
             android:indeterminateBehavior="repeat"
             android:minWidth="48dip"
             android:mirrorForRtl="true"
             android:paddingStart="50dp"
             android:paddingEnd="50dp"
+            android:progressBackgroundTint="@color/white"
             android:progressTint="#FFE700"
             android:scaleY="2" />
 
@@ -93,10 +95,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:background="#9AB285BD"
-            android:padding="10dp"
+            android:background="#654EA2"
+            android:paddingTop="20dp"
             android:text="TextView"
             android:textAlignment="center"
+            android:textColor="#E4E0EE"
             android:textSize="34sp"
             android:textStyle="bold" />
 
@@ -105,115 +108,131 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
-            android:background="#9AB285BD"
-            android:padding="5dp"
+            android:background="#654EA2"
+            android:paddingBottom="20dp"
             android:text="TextView"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:textColor="#E4E0EE" />
 
         <LinearLayout
-            android:id="@+id/layout_timer"
+            android:id="@+id/layout_timer_holder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
             android:layout_weight="5"
-            android:background="@drawable/rectangle_holder"
-            android:clipToPadding="false"
+            android:background="#3C2670"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="40dp">
+            android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/timer_hrsinput_et"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:ems="10"
-                android:hint="00h"
-                android:inputType="number"
-                android:textAlignment="center"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+            <LinearLayout
+                android:id="@+id/layout_timer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="30dp"
+                android:layout_weight="3"
+                android:background="@drawable/rectangle_holder"
+                android:clipToPadding="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="50dp"
+                android:paddingBottom="20dp">
 
-            <TextView
-                android:id="@+id/txt_semicolon1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/semicolon"
-                android:textAlignment="center" />
+                <EditText
+                    android:id="@+id/timer_hrsinput_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:ems="10"
+                    android:hint="00h"
+                    android:inputType="number"
+                    android:textAlignment="center"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/timer_minsinput_et"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:ems="10"
-                android:hint="00m"
-                android:inputType="number"
-                android:textAlignment="center"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txt_semicolon1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/semicolon"
+                    android:textAlignment="center"
+                    android:textSize="30sp" />
 
-            <TextView
-                android:id="@+id/txt_semicolon2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:text="@string/semicolon"
-                android:textAlignment="center" />
+                <EditText
+                    android:id="@+id/timer_minsinput_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:ems="10"
+                    android:hint="00m"
+                    android:inputType="number"
+                    android:textAlignment="center"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/timer_secinput_et"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.5"
-                android:ems="10"
-                android:hint="00s"
-                android:inputType="number"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txt_semicolon2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text="@string/semicolon"
+                    android:textAlignment="center"
+                    android:textSize="30sp" />
 
-            <View
-                android:id="@+id/view_divider"
-                android:layout_width="4dp"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:background="#664FA3" />
+                <EditText
+                    android:id="@+id/timer_secinput_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:ems="10"
+                    android:hint="00s"
+                    android:inputType="number"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/layout_timer_buttons"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="40dp"
+                android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical"
+                android:orientation="horizontal"
                 android:padding="0dp">
 
                 <Button
                     android:id="@+id/timer_btn_0"
-                    android:layout_width="80dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:backgroundTint="#664FA3"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
                     android:singleLine="true"
                     android:text="Cancel"
                     android:textAlignment="center"
                     android:textSize="16sp" />
 
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
                 <Button
                     android:id="@+id/timer_btn_1"
-                    android:layout_width="80dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
                     android:includeFontPadding="false"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:text="Start"
+                    android:text="@string/start"
                     android:textAlignment="center"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -226,7 +245,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="2"
-            android:background="#9AB285BD"
+            android:background="#644DA1"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="10dp">
@@ -252,6 +271,7 @@
                     android:layout_height="wrap_content"
                     android:text="Pet Archive"
                     android:textAlignment="center"
+                    android:textColor="#E6D9FB"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -271,11 +291,12 @@
                     app:srcCompat="@drawable/baseline_shopping_bag_24" />
 
                 <TextView
-                    android:id="@+id/textView6"
+                    android:id="@+id/txt_min"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Pet Inventory"
                     android:textAlignment="center"
+                    android:textColor="#E6D9FB"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -300,6 +321,7 @@
                     android:layout_height="wrap_content"
                     android:text="Exercise"
                     android:textAlignment="center"
+                    android:textColor="#E6D9FB"
                     android:textStyle="bold" />
             </LinearLayout>
 

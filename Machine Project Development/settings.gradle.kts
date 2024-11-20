@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "PomoPet"
-include(":app")
+include(":app", ":spotify-app-remote-release-0.8.0")
  

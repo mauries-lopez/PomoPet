@@ -50,6 +50,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
 
 dependencies {
@@ -78,5 +79,12 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation ("androidx.multidex:multidex:2.0.1")
+    implementation (files("../libs/spotify-app-remote-release-0.8.0.aar"))
+    implementation ("com.google.code.gson:gson:2.6.1")
+    implementation ("com.spotify.android:auth:1.2.5")
+    implementation ("androidx.browser:browser:1.0.0")
+    runtimeOnly("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+
 
 }

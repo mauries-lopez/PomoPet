@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ActivityInventoryBinding
 
 class InventoryActivity : AppCompatActivity() {
@@ -16,6 +18,15 @@ class InventoryActivity : AppCompatActivity() {
     var item2Image = -1
     var item3Image = -1
 
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
 
     // ----- Just an organized way to set inventories
     fun setRedPetInventory(evol: Int)
@@ -103,7 +114,7 @@ class InventoryActivity : AppCompatActivity() {
 
         val name = intent.getStringExtra(PetScreenActivity.PET_NAME).toString()
         val type = intent.getIntExtra(PetScreenActivity.PET_TYPE, -1)
-        val evol = intent.getIntExtra(PetScreenActivity.EVOL, -1)
+        val evol = intent.getIntExtra(PetScreenActivity.PET_EVOL, -1)
 
         // default values
         item1Image = R.drawable.item_questionmark
@@ -148,4 +159,10 @@ class InventoryActivity : AppCompatActivity() {
 
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 }

@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.compose.material3.Card
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.children
 import androidx.core.view.get
 import com.example.pomopet.databinding.ActivityPetArchiveBinding
@@ -30,6 +32,16 @@ class PetArchiveActivity : AppCompatActivity() {
         R.drawable.anim_evol3_purple,
         R.drawable.anim_evol3_red
     )
+
+    private fun hideSystemBars() {
+        val controller = WindowInsetsControllerCompat(
+            window, window.decorView
+        )
+
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
 
 
     companion object {
@@ -103,5 +115,11 @@ class PetArchiveActivity : AppCompatActivity() {
         }
 
     }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemBars()
+    }
+
 
 }
