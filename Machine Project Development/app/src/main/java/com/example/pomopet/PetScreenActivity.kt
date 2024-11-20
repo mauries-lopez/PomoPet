@@ -90,6 +90,8 @@ class PetScreenActivity : AppCompatActivity() {
         loadSettings() // always reload settings for pomodoro and break duration
     }
 
+    private lateinit var intentPomoPetService: Intent
+
     private val levelUpActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK){
 
@@ -239,6 +241,9 @@ class PetScreenActivity : AppCompatActivity() {
                     hourView.text = hourMinSec[0].toString()
                     minView.text = hourMinSec[1].toString().padStart(2, '0')
                     secView.text = hourMinSec[2].toString().padStart(2, '0')
+                    val time = hourMinSec[0].toString() + ":" + hourMinSec[1].toString().padStart(2, '0') + ":" + hourMinSec[2].toString().padStart(2, '0')
+                    intentPomoPetService.putExtra("CURRENT_TIME", time)
+                    startService(intentPomoPetService)
                 }
 
                 override fun onFinish() {
@@ -256,13 +261,11 @@ class PetScreenActivity : AppCompatActivity() {
                     // ----- Check if to continue Pomodoro
                     checkPomodoro()
 
+                    stopService(intentPomoPetService)
                 }
             }.start()
         }
-
     }
-
-
 
     // ----- Set countdown timer and updates the text in the timer
     private fun breakThreadStart(finalMillis: Long){
@@ -525,6 +528,9 @@ class PetScreenActivity : AppCompatActivity() {
     {
         // ----- Cancel the timer thread
         if (isPomoRunning) {
+
+            stopService(intentPomoPetService)
+
             timerThread?.cancel()
             isPomoRunning = false
 
@@ -534,6 +540,9 @@ class PetScreenActivity : AppCompatActivity() {
             petScreenBinding.timerBtn1.text = resources.getString(R.string.resume)
         }
         else if (isBreakRunning) {
+
+            stopService(intentPomoPetService)
+
             timerThread?.cancel()
             isBreakRunning = false
 
@@ -554,10 +563,12 @@ class PetScreenActivity : AppCompatActivity() {
         if (isPomoRunning) {
             timerThread?.cancel()
             isPomoRunning = false
+            stopService(intentPomoPetService)
         }
         else if (isBreakRunning) {
             timerThread?.cancel()
             isBreakRunning = false
+            stopService(intentPomoPetService)
         }
 
         changeTimerToEditText()
@@ -764,6 +775,8 @@ class PetScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        this.intentPomoPetService = Intent(this@PetScreenActivity, PomoPetService::class.java);
+
         // ViewBind activity_pet_screen.xml
         val petScreenBinding: ActivityPetScreenBinding = ActivityPetScreenBinding.inflate(layoutInflater)
 
@@ -873,13 +886,7 @@ class PetScreenActivity : AppCompatActivity() {
             val intent = Intent(this, ViewExerciseActivity::class.java)
             this.startActivity(intent)
         }
-
-
-
-
     }
-
-
 
     // ----- This is to stop the threads prior to finishing the activity
     override fun onDestroy() {
@@ -888,5 +895,8 @@ class PetScreenActivity : AppCompatActivity() {
         handler.removeCallbacksAndMessages(null)
 
         timerThread?.cancel()
+
+        stopService(Intent(this@PetScreenActivity, PomoPetService::class.java))
+
     }
 }
