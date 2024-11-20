@@ -22,6 +22,7 @@ class ViewExerciseAdapter(private val data: ArrayList<ViewExerDataModel>): Adapt
     override fun onBindViewHolder(holder: ViewExerViewHolder, position: Int) {
         holder.linkData(data[position])
 
+        /* Commenting this out, it loads ChosenExerciseActivity
         // Select random item from the dataset
         val randomItem = ExerciseDataSet.loadData().shuffled().first()
 
@@ -34,6 +35,8 @@ class ViewExerciseAdapter(private val data: ArrayList<ViewExerDataModel>): Adapt
             intent.putExtra("ITEM_DESC", randomItem.exerDesc)
             holder.itemView.context.startActivity(intent)
         }
+
+         */
     }
 
     //Specify ArrayList size

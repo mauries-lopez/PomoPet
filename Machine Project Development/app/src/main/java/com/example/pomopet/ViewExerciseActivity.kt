@@ -41,7 +41,6 @@ class ViewExerciseActivity : AppCompatActivity() {
             this, LinearLayoutManager.HORIZONTAL, false)
 
         viewBinding.floatBackBtn.setOnClickListener {
-            val intent = Intent()
             finish()
         }
     }

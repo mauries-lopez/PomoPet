@@ -1,6 +1,8 @@
 package com.example.pomopet
 
+
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -8,12 +10,17 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
 import android.webkit.WebView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ChosenExerciseBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+
 
 class ChosenExerciseActivity : AppCompatActivity() {
 
@@ -23,6 +30,8 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
     // Initialize chosen record
     private lateinit var viewBinding: ChosenExerciseBinding
+
+
 
     // Initialize for sensors
     private lateinit var sensorManager: SensorManager
@@ -52,6 +61,9 @@ class ChosenExerciseActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
+
         super.onCreate(savedInstanceState)
         viewBinding = ChosenExerciseBinding.inflate(layoutInflater) // Inflate the binding
         setContentView(viewBinding.root) // Set the content view to the binding's root
@@ -75,22 +87,58 @@ class ChosenExerciseActivity : AppCompatActivity() {
         // Use view binding to set the data to the views
         viewBinding.chosenName.text = currentExercise
         viewBinding.chosenIcon.setImageResource(intent.getIntExtra("EXER_ICON", 0))
-        viewBinding.chosenDesc.text = intent.getStringExtra("EXER_DESC") ?: "No Description"
-        viewBinding.chosenVid.settings.javaScriptEnabled = true
-        viewBinding.chosenVid.loadData(intent.getStringExtra("EXER_VID") ?: "No Video", "text/html", "UTF-8")
+
 
         // If the user does not want to finish/perform the exercise
-        viewBinding.finishBtn.setOnClickListener {
-            // Reset variables
-            exerCount = 0
-            levelScalar = 0
-            lastIncrementTime = 0
+        viewBinding.finishBtn.setOnClickListener{
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+            builder.setTitle("Warning")
 
-            // Send single level-up result
-            val intent = Intent()
-            intent.putExtra("LEVEL_SCALAR", 1)  // Indicate single level-up (x1 bonus)
-            setResult(RESULT_OK, intent)
-            finish()
+            builder.setMessage("Finishing will only give you x1 level up. Are you sure you want to proceed?")
+                .setPositiveButton("Yes") { dialog, which ->
+
+                    hideSystemBars()
+                    // Reset variables
+                    exerCount = 0
+                    levelScalar = 0
+                    lastIncrementTime = 0
+
+                    // Send single level-up result
+                    val intent = Intent()
+                    intent.putExtra("LEVEL_SCALAR", 1)  // Indicate single level-up (x1 bonus)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                }
+                .setNegativeButton("No") { dialog, which ->
+                    hideSystemBars()
+                    dialog.dismiss()
+                }
+                .show()
+
+
+            builder.show()
+        }
+
+        viewBinding.btnChosenExercise.setOnClickListener{
+
+            val inflater = LayoutInflater.from(this)
+            val viewInitialized = inflater.inflate(R.layout.builder_exercise_video_desc, null)
+
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+            builder.setTitle(currentExercise)
+            builder.setView(viewInitialized)
+            val video_exer = viewInitialized.findViewById<WebView>(R.id.video_exer)
+            val txt_help_exer = viewInitialized.findViewById<TextView>(R.id.txt_help_exer)
+
+            video_exer.settings.javaScriptEnabled = true
+            video_exer.loadData(intent.getStringExtra("EXER_VID") ?: "No Video", "text/html", "UTF-8")
+            txt_help_exer.setText(intent.getStringExtra("EXER_DESC") ?: "No Description")
+
+            builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+                //Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
+                hideSystemBars()
+            }
+            builder.show()
         }
     }
 
