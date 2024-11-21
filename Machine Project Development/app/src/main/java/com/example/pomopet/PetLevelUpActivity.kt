@@ -55,7 +55,7 @@ class PetLevelUpActivity : AppCompatActivity() {
         }
 
         val exerciseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK && intent.getIntExtra("LEVEL_SCALAR", 0) == 2) {
+            if (result.resultCode == RESULT_OK && result.data!!.getIntExtra("LEVEL_SCALAR", 0) == 2) {
                 // The user completed the exercise; grant x2 level up
                 val returnIntent = Intent()
                 returnIntent.putExtra("LEVEL_SCALAR", 2) // Double Level Up

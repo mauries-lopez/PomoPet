@@ -205,13 +205,13 @@ class ChosenExerciseActivity : AppCompatActivity() {
             "Jumping Jacks" -> {
                 if (!isGyroscope && z > 10) { // Use accelerometer for Jumping Jacks
                     Log.d("SensorData", "x: $x, y: $y, z: $z")
-                    levelScalar = 1
+                   // levelScalar = 1
                     exerCount++
                     updateExerciseCounter(exerCount)
 
                     // Finishing the exercise
                     if (exerCount == 10){
-                        levelScalar = 2
+                        // levelScalar = 2
                         finishExer()
                     }
                 }
@@ -222,13 +222,13 @@ class ChosenExerciseActivity : AppCompatActivity() {
                     if (y > 10) {
                         // Squat up logic
 
-                        levelScalar = 1
+                        // levelScalar = 1
                         exerCount++
                         updateExerciseCounter(exerCount)
 
                         // Finishing the exercise
                         if (exerCount == 10){
-                            levelScalar = 2
+
                             finishExer()
                         }
                     }
@@ -239,13 +239,13 @@ class ChosenExerciseActivity : AppCompatActivity() {
                 if (isGyroscope) { // Use gyroscope for Lunges
                     if (x > 6 || x < -6) {
 
-                        levelScalar = 1
+                        // levelScalar = 1
                         exerCount++
                         updateExerciseCounter(exerCount)
 
                         // Finishing the exercise
                         if (exerCount == 10){
-                            levelScalar = 2
+                            // levelScalar = 2
                             finishExer()
                         }
                     }
@@ -262,6 +262,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
     }
 
     private fun finishExer(){
+        levelScalar = 2
         Toast.makeText(this, "EXERCISE FINISHED!", Toast.LENGTH_SHORT).show()
 
         Log.d("ChosenExerciseActivity", "LevelScalar Value: $levelScalar")
@@ -270,11 +271,6 @@ class ChosenExerciseActivity : AppCompatActivity() {
         val intent = Intent()
         intent.putExtra("LEVEL_SCALAR", 2)  // Indicate double level-up (x2 bonus)
         setResult(RESULT_OK, intent)
-
-        // Reset variables
-        exerCount = 0
-        levelScalar = 0
-        lastIncrementTime = 0
 
         finish()
     }
