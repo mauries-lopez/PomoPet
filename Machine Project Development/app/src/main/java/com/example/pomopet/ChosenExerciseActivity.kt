@@ -115,8 +115,6 @@ class ChosenExerciseActivity : AppCompatActivity() {
                 }
                 .show()
 
-
-            builder.show()
         }
 
         viewBinding.btnChosenExercise.setOnClickListener{

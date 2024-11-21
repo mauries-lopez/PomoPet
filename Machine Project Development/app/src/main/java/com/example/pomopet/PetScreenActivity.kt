@@ -559,26 +559,43 @@ class PetScreenActivity : AppCompatActivity() {
 
     private fun cancelTimer(petScreenBinding: ActivityPetScreenBinding)
     {
-        levelUpPause = -1
+        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+        builder.setTitle("Cancel Timer?")
 
-        // ----- Cancel the timer thread
-        if (isPomoRunning) {
-            timerThread?.cancel()
-            isPomoRunning = false
-        }
-        else if (isBreakRunning) {
-            timerThread?.cancel()
-            isBreakRunning = false
-        }
+        builder.setMessage("Are you sure you want to cancel the current pomodoro timer?\n\n No EXP will be earned.")
+            // Show "Yes No" in that sequence rather than "No Yes"
+            .setNegativeButton("Yes") { dialog, which ->
 
-        changeTimerToEditText()
-        changeUIBreakToTimer()
+                hideSystemBars()
 
-        // ----- Disable start button and enable cancel button
-        petScreenBinding.timerBtn0.isEnabled = false
-        petScreenBinding.timerBtn1.isEnabled = true
+                levelUpPause = -1
 
-        petScreenBinding.timerBtn1.text = resources.getString(R.string.start)
+                // ----- Cancel the timer thread
+                if (isPomoRunning) {
+                    timerThread?.cancel()
+                    isPomoRunning = false
+                }
+                else if (isBreakRunning) {
+                    timerThread?.cancel()
+                    isBreakRunning = false
+                }
+
+                changeTimerToEditText()
+                changeUIBreakToTimer()
+
+                // ----- Disable start button and enable cancel button
+                petScreenBinding.timerBtn0.isEnabled = false
+                petScreenBinding.timerBtn1.isEnabled = true
+
+                petScreenBinding.timerBtn1.text = resources.getString(R.string.start)
+
+            }
+            .setPositiveButton("No") { dialog, which ->
+                hideSystemBars()
+                dialog.dismiss()
+            }
+            .show()
+
     }
 
     private fun timeToMillis(hour: Int, min: Int, sec: Int): Long{
