@@ -15,6 +15,8 @@ import android.view.View
 import android.webkit.WebView
 import android.widget.TextView
 import android.widget.Toast
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -91,29 +93,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
         // If the user does not want to finish/perform the exercise
         viewBinding.finishBtn.setOnClickListener{
-            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
-            builder.setTitle("Warning")
-
-            builder.setMessage("Finishing will only give you x1 level up. Are you sure you want to proceed?")
-                .setPositiveButton("Yes") { dialog, which ->
-
-                    hideSystemBars()
-                    // Reset variables
-                    exerCount = 0
-                    levelScalar = 0
-                    lastIncrementTime = 0
-
-                    // Send single level-up result
-                    val intent = Intent()
-                    intent.putExtra("LEVEL_SCALAR", 1)  // Indicate single level-up (x1 bonus)
-                    setResult(RESULT_OK, intent)
-                    finish()
-                }
-                .setNegativeButton("No") { dialog, which ->
-                    hideSystemBars()
-                    dialog.dismiss()
-                }
-                .show()
+            makeWarningBack()
 
         }
 
@@ -162,7 +142,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
                     Log.d("CurrentExercise", "Exercise selected: $currentExercise")
                     Log.d("RawSensorData", "Sensor: ${event.sensor.name}, x: ${event.values[0]}, y: ${event.values[1]}, z: ${event.values[2]}")
 
-                    if (currentTime - lastIncrementTime > 500) {
+                    if (currentTime - lastIncrementTime > 700) {
 
                         when (event.sensor.type) {
                             // For squats and jumping jacks for linear movement
@@ -193,6 +173,12 @@ class ChosenExerciseActivity : AppCompatActivity() {
             }
         }
 
+        onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                makeWarningBack()
+            }
+        })
+
         sensorManager.registerListener(sensorEventListener, accelerometerSensor, SensorManager.SENSOR_DELAY_UI)
         sensorManager.registerListener(sensorEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI)
     }
@@ -200,6 +186,33 @@ class ChosenExerciseActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         sensorManager.unregisterListener(sensorEventListener)
+    }
+
+    private fun makeWarningBack()
+    {
+        val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+        builder.setTitle("Warning")
+
+        builder.setMessage("Finishing will only give you x1 level up. Are you sure you want to proceed?")
+            .setNegativeButton("Yes") { dialog, which ->
+
+                hideSystemBars()
+                // Reset variables
+                exerCount = 0
+                levelScalar = 0
+                lastIncrementTime = 0
+
+                // Send single level-up result
+                val intent = Intent()
+                intent.putExtra("LEVEL_SCALAR", 1)  // Indicate single level-up (x1 bonus)
+                setResult(RESULT_OK, intent)
+                finish()
+            }
+            .setPositiveButton("No") { dialog, which ->
+                hideSystemBars()
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun determineExercise(currentExercise: String?, x: Float, y: Float, z: Float, isGyroscope: Boolean = false) {
@@ -210,7 +223,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
         when (currentExercise) {
             "Jumping Jacks" -> {
-                if (!isGyroscope && y > 8) { // Use accelerometer for Jumping Jacks
+                if (!isGyroscope && x > 10) { // Use accelerometer for Jumping Jacks
                     Log.d("SensorData", "x: $x, y: $y, z: $z")
                    // levelScalar = 1
                     exerCount++
@@ -227,7 +240,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
             // Works
             "Squats" -> {
                 if (!isGyroscope) { // Use accelerometer for Squats
-                    if (y > 10) {
+                    if (y > 13) {
                         // Squat up logic
 
                         // levelScalar = 1
@@ -246,7 +259,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
             // Works when you move the phone, pero rotate ???
             "Lunges" -> {
                 if (isGyroscope) { // Use gyroscope for Lunges
-                    if (y > 3) {
+                    if (y > 2) {
 
                         // levelScalar = 1
                         exerCount++
@@ -270,6 +283,8 @@ class ChosenExerciseActivity : AppCompatActivity() {
         viewBinding.exerCounter.text = "Repetitions: $exerCount"
 
     }
+
+
 
     private fun finishExer(){
         levelScalar = 2
