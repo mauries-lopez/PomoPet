@@ -157,27 +157,34 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
         sensorEventListener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
+                val currentTime = System.currentTimeMillis()
                 if (event != null) {
                     Log.d("CurrentExercise", "Exercise selected: $currentExercise")
                     Log.d("RawSensorData", "Sensor: ${event.sensor.name}, x: ${event.values[0]}, y: ${event.values[1]}, z: ${event.values[2]}")
-                    when (event.sensor.type) {
-                        // For squats and jumping jacks for linear movement
-                        Sensor.TYPE_ACCELEROMETER -> {
-                            // Pass accelerometer data to determineExercise
-                            val x = event.values[0]
-                            val y = event.values[1]
-                            val z = event.values[2]
-                            determineExercise(currentExercise, x, y, z, isGyroscope = false)
-                        }
-                        // For lunges exercise to measure rotational movement
-                        Sensor.TYPE_GYROSCOPE -> {
-                            // Pass gyroscope data to determineExercise if needed
-                            val x = event.values[0]
-                            val y = event.values[1]
-                            val z = event.values[2]
-                            determineExercise(currentExercise, x, y, z, isGyroscope = true)
+
+                    if (currentTime - lastIncrementTime > 500) {
+
+                        when (event.sensor.type) {
+                            // For squats and jumping jacks for linear movement
+                            Sensor.TYPE_ACCELEROMETER -> {
+                                // Pass accelerometer data to determineExercise
+                                val x = event.values[0]
+                                val y = event.values[1]
+                                val z = event.values[2]
+                                determineExercise(currentExercise, x, y, z, isGyroscope = false)
+                            }
+                            // For lunges exercise to measure rotational movement
+                            Sensor.TYPE_GYROSCOPE -> {
+                                // Pass gyroscope data to determineExercise if needed
+                                val x = event.values[0]
+                                val y = event.values[1]
+                                val z = event.values[2]
+                                determineExercise(currentExercise, x, y, z, isGyroscope = true)
+                            }
                         }
                     }
+
+
                 }
             }
 
@@ -197,17 +204,18 @@ class ChosenExerciseActivity : AppCompatActivity() {
 
     private fun determineExercise(currentExercise: String?, x: Float, y: Float, z: Float, isGyroscope: Boolean = false) {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastIncrementTime < 50000) return // Ignore if within 50000ms
+       //  if (currentTime - lastIncrementTime < 50000) return // Ignore if within 50000ms
 
         Log.d("ExerciseDebug", "currentExercise: $currentExercise, x: $x, y: $y, z: $z, isGyroscope: $isGyroscope")
 
         when (currentExercise) {
             "Jumping Jacks" -> {
-                if (!isGyroscope && z > 10) { // Use accelerometer for Jumping Jacks
+                if (!isGyroscope && y > 8) { // Use accelerometer for Jumping Jacks
                     Log.d("SensorData", "x: $x, y: $y, z: $z")
                    // levelScalar = 1
                     exerCount++
                     updateExerciseCounter(exerCount)
+                    lastIncrementTime = currentTime
 
                     // Finishing the exercise
                     if (exerCount == 10){
@@ -225,6 +233,7 @@ class ChosenExerciseActivity : AppCompatActivity() {
                         // levelScalar = 1
                         exerCount++
                         updateExerciseCounter(exerCount)
+                        lastIncrementTime = currentTime
 
                         // Finishing the exercise
                         if (exerCount == 10){
@@ -237,11 +246,12 @@ class ChosenExerciseActivity : AppCompatActivity() {
             // Works when you move the phone, pero rotate ???
             "Lunges" -> {
                 if (isGyroscope) { // Use gyroscope for Lunges
-                    if (x > 6 || x < -6) {
+                    if (y > 3) {
 
                         // levelScalar = 1
                         exerCount++
                         updateExerciseCounter(exerCount)
+                        lastIncrementTime = currentTime
 
                         // Finishing the exercise
                         if (exerCount == 10){
