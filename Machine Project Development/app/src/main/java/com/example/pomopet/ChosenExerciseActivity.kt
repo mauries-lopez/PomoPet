@@ -272,6 +272,12 @@ class ChosenExerciseActivity : AppCompatActivity() {
         intent.putExtra("LEVEL_SCALAR", 2)  // Indicate double level-up (x2 bonus)
         setResult(RESULT_OK, intent)
 
+        // Reset variables
+        exerCount = 0
+        levelScalar = 0
+        lastIncrementTime = 0
+
+
         finish()
     }
 }
