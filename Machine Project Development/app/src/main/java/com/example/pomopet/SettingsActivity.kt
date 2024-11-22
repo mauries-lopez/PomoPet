@@ -1,5 +1,6 @@
 package com.example.pomopet
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -53,7 +54,6 @@ class SettingsActivity : AppCompatActivity() {
 
         settingsBinding.sliderVolume.addOnChangeListener{slider, value, fromUser ->
             volumeLevel = value
-
         }
 
         settingsBinding.btnPomoBack.setOnClickListener{
@@ -117,7 +117,9 @@ class SettingsActivity : AppCompatActivity() {
             editor.putInt(POMODOROS_SETTINGS, currentPomodoroIndex)
             editor.putInt(POMO_BREAK_DURATION_SETTINGS, currentBreakIndex)
             editor.apply()
-
+            val intentBGMService = Intent(this, BGMService::class.java)
+            intentBGMService.putExtra("SIGNAL_KEY", "volume")
+            startService(intentBGMService)
             Toast.makeText(this, "Successfully saved settings!", Toast.LENGTH_SHORT).show()
         }
     }

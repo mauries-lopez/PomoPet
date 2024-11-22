@@ -7,6 +7,10 @@
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true"/>
     <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="true"/>
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+
 
     <application
         android:allowBackup="true"
@@ -53,6 +57,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".BGMService" android:enabled="true" android:exported="false" android:foregroundServiceType="mediaPlayback"/>
+
     </application>
 
 </manifest>

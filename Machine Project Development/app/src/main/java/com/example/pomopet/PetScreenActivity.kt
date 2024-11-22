@@ -86,6 +86,8 @@ class PetScreenActivity : AppCompatActivity() {
     private var settingsPomodoro = -1
     private var settingsBreakDuration = -1
 
+    private lateinit var intentBGMService: Intent
+
     private val settingsActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         result:ActivityResult ->
         loadSettings() // always reload settings for pomodoro and break duration
@@ -234,6 +236,11 @@ class PetScreenActivity : AppCompatActivity() {
     private fun timerThreadStart(finalMillis: Long){
         if (!isPomoRunning) { // This is so clicking start and resume repeatedly does not result in giving exp more than once
             isPomoRunning = true
+
+            // Play Background Music
+            intentBGMService.putExtra("SIGNAL_KEY", "start".toString())
+            startService(intentBGMService)
+
             // ----- Change text to pause
             petScreenBinding.timerBtn1.text = resources.getString(R.string.pause)
 
@@ -259,6 +266,9 @@ class PetScreenActivity : AppCompatActivity() {
                     isPomoRunning = false
 
                     levelUpPause = -1
+
+                    intentBGMService.putExtra("SIGNAL_KEY", "finished")
+                    stopService(intentBGMService)
 
                     // ----- Check if to continue Pomodoro
                     checkPomodoro()
@@ -417,8 +427,6 @@ class PetScreenActivity : AppCompatActivity() {
         // If timer start button is clicked, change EditText to TextViews
         petScreenBinding.timerBtn1.setOnClickListener{
 
-
-
             if (petScreenBinding.timerBtn1.text.toString() == resources.getString(R.string.start)) {
                 var getHour = findViewById<EditText>(timerIds[0]).text.toString()
                 var getMin = findViewById<EditText>(timerIds[1]).text.toString()
@@ -541,6 +549,9 @@ class PetScreenActivity : AppCompatActivity() {
 
             levelUpPause = 0
 
+            intentBGMService.putExtra("SIGNAL_KEY", "pause")
+            startService(intentBGMService)
+
             // ----- Change text to resume
             petScreenBinding.timerBtn1.text = resources.getString(R.string.resume)
         }
@@ -572,10 +583,18 @@ class PetScreenActivity : AppCompatActivity() {
 
                 // ----- Cancel the timer thread
                 if (isPomoRunning) {
+
+                    intentBGMService.putExtra("SIGNAL_KEY", "finished")
+                    stopService(intentBGMService)
+
                     timerThread?.cancel()
                     isPomoRunning = false
                 }
                 else if (isBreakRunning) {
+
+                    intentBGMService.putExtra("SIGNAL_KEY", "finished")
+                    stopService(intentBGMService)
+
                     timerThread?.cancel()
                     isBreakRunning = false
                 }
@@ -714,10 +733,7 @@ class PetScreenActivity : AppCompatActivity() {
             // pause timer
             pauseTimer()
 
-
-
             makeLevelUpUI()
-
 
             pomoDBHelper.setPetToLevelUp(currentPet)
 
@@ -800,6 +816,8 @@ class PetScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        this.intentBGMService = Intent(this@PetScreenActivity, BGMService::class.java)
 
         // ViewBind activity_pet_screen.xml
         val petScreenBinding: ActivityPetScreenBinding = ActivityPetScreenBinding.inflate(layoutInflater)
@@ -929,6 +947,8 @@ class PetScreenActivity : AppCompatActivity() {
         handlerThread.quit()
         handler.removeCallbacksAndMessages(null)
 
+
+        stopService(intentBGMService)
         timerThread?.cancel()
     }
 }
