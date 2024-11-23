@@ -109,6 +109,10 @@ class SettingsActivity : AppCompatActivity() {
             editor.putInt(POMO_BREAK_DURATION_SETTINGS, currentBreakIndex)
             editor.apply()
 
+            val intentBGMService = Intent(this, BGMService::class.java)
+            intentBGMService.putExtra("SIGNAL_KEY", "volume")
+            startService(intentBGMService)
+
             Toast.makeText(this, "Successfully reset settings!", Toast.LENGTH_SHORT).show()
         }
 
