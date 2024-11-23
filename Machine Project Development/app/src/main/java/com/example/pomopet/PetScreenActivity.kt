@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Handler
 import android.os.HandlerThread
+import android.text.InputFilter
 import android.text.InputType
 import android.util.Log
 import android.view.Gravity
@@ -195,7 +196,9 @@ class PetScreenActivity : AppCompatActivity() {
         hourInput_et.textAlignment = TEXT_ALIGNMENT_CENTER
         hourInput_et.textSize = 28f
         hourInput_et.typeface = Typeface.DEFAULT_BOLD
+        hourInput_et.filters += InputFilter.LengthFilter(1)
         petScreenBinding.layoutTimer.addView(hourInput_et, 0)
+
         // (2.2) Minute Input
         val minInput_et = EditText(this@PetScreenActivity)
         minInput_et.setLayoutParams(
@@ -212,6 +215,7 @@ class PetScreenActivity : AppCompatActivity() {
         minInput_et.textAlignment = TEXT_ALIGNMENT_CENTER
         minInput_et.textSize = 28f
         minInput_et.typeface = Typeface.DEFAULT_BOLD
+        minInput_et.filters += InputFilter.LengthFilter(2)
         petScreenBinding.layoutTimer.addView(minInput_et, 2)
         // (2.3) Second Input
         val secInput_et = EditText(this@PetScreenActivity)
@@ -229,6 +233,7 @@ class PetScreenActivity : AppCompatActivity() {
         secInput_et.textAlignment = TEXT_ALIGNMENT_CENTER
         secInput_et.textSize = 28f
         secInput_et.typeface = Typeface.DEFAULT_BOLD
+        secInput_et.filters += InputFilter.LengthFilter(2)
         petScreenBinding.layoutTimer.addView(secInput_et, 4)
     }
 
