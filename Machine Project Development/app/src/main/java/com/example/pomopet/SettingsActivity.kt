@@ -113,7 +113,7 @@ class SettingsActivity : AppCompatActivity() {
             intentBGMService.putExtra("SIGNAL_KEY", "volume")
             startService(intentBGMService)
 
-            Toast.makeText(this, "Successfully reset settings!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Successfully reset settings! Pomodoro timer settings will apply on the next set of pomodoros.", Toast.LENGTH_SHORT).show()
         }
 
         settingsBinding.btnSaveSettings.setOnClickListener{
@@ -124,7 +124,7 @@ class SettingsActivity : AppCompatActivity() {
             val intentBGMService = Intent(this, BGMService::class.java)
             intentBGMService.putExtra("SIGNAL_KEY", "volume")
             startService(intentBGMService)
-            Toast.makeText(this, "Successfully saved settings!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Successfully saved settings! Pomodoro timer settings will apply on the next set of pomodoros.", Toast.LENGTH_SHORT).show()
         }
     }
 
