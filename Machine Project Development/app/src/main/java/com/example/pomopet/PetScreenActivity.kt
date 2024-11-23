@@ -78,7 +78,7 @@ class PetScreenActivity : AppCompatActivity() {
     private lateinit var hourView: TextView
     private lateinit var minView: TextView
     private lateinit var secView: TextView
-    private var levelUpPause = -1 // which timer triggered the pause
+    private var initiatedPause = -1 // which timer triggered the pause; 0 is pomodoro, 1 is break
 
     // settings variables
     private var currentPomodoro = -1
@@ -154,9 +154,9 @@ class PetScreenActivity : AppCompatActivity() {
 
             // resume timer
             if (currentPomodoro > 0) {
-                if (levelUpPause == 0)
+                if (initiatedPause == 0)
                     timerThreadStart(remainingMillisTimer)
-                else if (levelUpPause == 1)
+                else if (initiatedPause == 1)
                     breakThreadStart(remainingMillisTimer)
             }
         }
@@ -265,7 +265,7 @@ class PetScreenActivity : AppCompatActivity() {
                     petScreenBinding.timerBtn1.text = resources.getString(R.string.start)
                     isPomoRunning = false
 
-                    levelUpPause = -1
+                    initiatedPause = -1
 
                     intentBGMService.putExtra("SIGNAL_KEY", "finished")
                     stopService(intentBGMService)
@@ -303,7 +303,7 @@ class PetScreenActivity : AppCompatActivity() {
 
                 override fun onFinish() {
 
-                    levelUpPause = -1
+                    initiatedPause = -1
 
                     // ----- Set button text to start
                     petScreenBinding.timerBtn1.text = resources.getString(R.string.start)
@@ -459,7 +459,10 @@ class PetScreenActivity : AppCompatActivity() {
                 }
             }
             else if (petScreenBinding.timerBtn1.text.toString() == resources.getString(R.string.resume)){
-                timerThreadStart(remainingMillisTimer)
+                if (initiatedPause == 0)
+                    timerThreadStart(remainingMillisTimer)
+                else if (initiatedPause == 1)
+                    breakThreadStart(remainingMillisTimer)
 
             }
             else if (petScreenBinding.timerBtn1.text.toString() == resources.getString(R.string.pause)) {
@@ -547,7 +550,7 @@ class PetScreenActivity : AppCompatActivity() {
             timerThread?.cancel()
             isPomoRunning = false
 
-            levelUpPause = 0
+            initiatedPause = 0
 
             intentBGMService.putExtra("SIGNAL_KEY", "pause")
             startService(intentBGMService)
@@ -559,7 +562,7 @@ class PetScreenActivity : AppCompatActivity() {
             timerThread?.cancel()
             isBreakRunning = false
 
-            levelUpPause = 1
+            initiatedPause = 1
 
             // ----- Change text to resume
             petScreenBinding.timerBtn1.text = resources.getString(R.string.resume)
@@ -573,13 +576,13 @@ class PetScreenActivity : AppCompatActivity() {
         val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
         builder.setTitle("Cancel Timer?")
 
-        builder.setMessage("Are you sure you want to cancel the current pomodoro timer?\n\n No EXP will be earned.")
+        builder.setMessage("Are you sure you want to cancel the current pomodoro timer?\n\n No EXP will be earned if a pomodoro timer is running.")
             // Show "Yes No" in that sequence rather than "No Yes"
             .setNegativeButton("Yes") { dialog, which ->
 
                 hideSystemBars()
 
-                levelUpPause = -1
+                initiatedPause = -1
 
                 // ----- Cancel the timer thread
                 if (isPomoRunning) {
