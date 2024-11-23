@@ -125,7 +125,8 @@ class BGMService : Service() {
         var volumeLevel = sharedPref.getFloat("VOLUME_SETTINGS", 0F)
         volumeLevel /= 100F
 
-        mediaPlayer!!.setVolume(volumeLevel, volumeLevel)
+        if (mediaPlayer != null)
+            mediaPlayer!!.setVolume(volumeLevel, volumeLevel)
     }
 
     private fun onFinished(){
