@@ -23,6 +23,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.HtmlCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.SettingsActivity.Companion.FILE_SETTINGS
@@ -886,29 +887,33 @@ class PetScreenActivity : AppCompatActivity() {
         petScreenBinding.helpBtn.setOnClickListener{
             val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
             builder.setTitle("PomoPet Help")
-            builder.setMessage(
-                        "This game calculates experience points (EXP) for your pet based on time spent during activities such as Pomodoro sessions. Here's how it works:\n\n" +
-                        "Maximum Experience per Level:\n" +
-                        "Level 1: 1,000 EXP\n" +
-                        "Level 2: 2,000 EXP\n" +
-                        "Level 3: 3,000 EXP\n" +
-                        "Level 4: 4,000 EXP\n" +
-                        "Level N: N * 1000 EXP (i.e., the maximum EXP for a given level is the level number multiplied by 1,000).\n\n" +
-                        "Evolutions:\n" +
-                        "Level 10: 1st Evolution\n" +
-                        "Level 20: 2nd Evolution\n\n" +
-                        "Experience Computation:\n" +
-                        "Per second: You earn 0.5 EXP for each second of activity.\n\n" +
-                        "Example Calculation:\n" +
-                        "A 1-hour Pomodoro session (3,600 seconds) would earn you:\n" +
-                        "3,600 × 0.5 = 1,800 EXP\n" +
-                        "This is enough to level up from Level 1 to Level 2.\n\n" +
-                        "EXP Calculation Based on Time:\n" +
-                        "[1] If the time is given in hours, the system will compute the total EXP based on the number of hours.\n" +
-                        "[2] If the time is given in minutes, the system will compute EXP based on minutes.\n" +
-                        "[3] If the time is given in seconds, the system will compute EXP based on the exact number of seconds.\n\n" +
-                        "You can use this system to track your pet's progress, level it up, and unlock evolutions!"
-            )
+
+            val helpMessage = "This game calculates experience points (EXP) for your pet based on time spent during activities such as Pomodoro sessions. Here's how it works:<br><br>" +
+                    "<b>Maximum Experience per Level</b><br>" +
+                    "Level 1: 1,000 EXP<br>" +
+                    "Level 2: 2,000 EXP<br>" +
+                    "Level 3: 3,000 EXP<br>" +
+                    "Level 4: 4,000 EXP<br>" +
+                    "Level N: N * 1000 EXP (i.e., the maximum EXP for a given level is the level number multiplied by 1,000).<br><br><br>" +
+                    "<b>Evolutions</b><br>" +
+                    "Level 10: 1st Evolution<br>" +
+                    "Level 20: 2nd Evolution<br><br>" +
+                    "<b>Experience Computation</b><br>" +
+                    "Per second: You earn 0.5 EXP for each second of activity.<br><br>" +
+                    "<b>Example Calculation</b><br>" +
+                    "A 1-hour Pomodoro session (3,600 seconds) would earn you:<br>" +
+                    "3,600 × 0.5 = 1,800 EXP<br>" +
+                    "This is enough to level up from Level 1 to Level 2.<br><br>" +
+                    "<b>EXP Calculation Based on Time</b><br>" +
+                    "[1] If the time is given in hours, the system will compute the total EXP based on the number of hours.<br>" +
+                    "[2] If the time is given in minutes, the system will compute EXP based on minutes.<br>" +
+                    "[3] If the time is given in seconds, the system will compute EXP based on the exact number of seconds.<br><br>" +
+                    "You can use this system to track your pet's progress, level it up, and unlock evolutions!"
+
+            val styledMessage = HtmlCompat.fromHtml(helpMessage, HtmlCompat.FROM_HTML_MODE_LEGACY)
+
+            builder.setMessage(styledMessage)
+
 
             builder.setPositiveButton(android.R.string.ok) { dialog, which ->
                 //Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
