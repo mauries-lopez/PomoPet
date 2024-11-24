@@ -243,6 +243,8 @@ class PetScreenActivity : AppCompatActivity() {
         if (!isPomoRunning) { // This is so clicking start and resume repeatedly does not result in giving exp more than once
             isPomoRunning = true
 
+            changeUITimerTextColor("#48444E")
+
             // Play Background Music
             intentBGMService.putExtra("SIGNAL_KEY", "start".toString())
             startService(intentBGMService)
@@ -292,6 +294,8 @@ class PetScreenActivity : AppCompatActivity() {
         if (!isBreakRunning) {
             isBreakRunning = true
 
+            changeUITimerTextColor("#E4E0EE")
+
             // ----- Change text to pause
             petScreenBinding.timerBtn1.text = resources.getString(R.string.pause)
 
@@ -314,7 +318,7 @@ class PetScreenActivity : AppCompatActivity() {
                     // ----- Set button text to start
                     petScreenBinding.timerBtn1.text = resources.getString(R.string.start)
                     isBreakRunning = false
-                    changeUIBreakToTimer()
+                    changeUIColorBreakToTimer()
                     timerThreadStart(originalMillisTimer)
 
 
@@ -370,7 +374,7 @@ class PetScreenActivity : AppCompatActivity() {
 
         // if pomodoro > 0, start break
         if (currentPomodoro > 0) {
-            changeUITimerToBreak()
+            changeUIColorTimerToBreak()
             breakThreadStart(settingsBreakDuration * 60000L)
         }
         // else, end
@@ -380,24 +384,24 @@ class PetScreenActivity : AppCompatActivity() {
 
     }
 
-    private fun changeUITimerToBreak()
+    private fun changeUIColorTimerToBreak()
     {
-        petScreenBinding.txtSemicolon1.setTextColor(Color.parseColor("#E4E0EE"))
-        petScreenBinding.txtSemicolon2.setTextColor(Color.parseColor("#E4E0EE"))
-        hourView.setTextColor(Color.parseColor("#E4E0EE"))
-        minView.setTextColor(Color.parseColor("#E4E0EE"))
-        secView.setTextColor(Color.parseColor("#E4E0EE"))
+        changeUITimerTextColor("#E4E0EE")
         petScreenBinding.layoutTimer.setBackgroundResource(R.drawable.rectangle_holder_color_inverted)
     }
 
-    private fun changeUIBreakToTimer()
+    private fun changeUITimerTextColor(color: String)
     {
-        petScreenBinding.txtSemicolon1.setTextColor(Color.parseColor("#48444E"))
-        petScreenBinding.txtSemicolon2.setTextColor(Color.parseColor("#48444E"))
-        hourView.setTextColor(Color.parseColor("#48444E"))
-        minView.setTextColor(Color.parseColor("#48444E"))
-        secView.setTextColor(Color.parseColor("#48444E"))
+        petScreenBinding.txtSemicolon1.setTextColor(Color.parseColor(color))
+        petScreenBinding.txtSemicolon2.setTextColor(Color.parseColor(color))
+        hourView.setTextColor(Color.parseColor(color))
+        minView.setTextColor(Color.parseColor(color))
+        secView.setTextColor(Color.parseColor(color))
+    }
 
+    private fun changeUIColorBreakToTimer()
+    {
+        changeUITimerTextColor("#48444E")
         petScreenBinding.layoutTimer.setBackgroundResource(R.drawable.rectangle_holder)
     }
 
@@ -558,6 +562,8 @@ class PetScreenActivity : AppCompatActivity() {
 
             initiatedPause = 0
 
+            changeUITimerTextColor("#9E9AA8")
+
             intentBGMService.putExtra("SIGNAL_KEY", "pause")
             startService(intentBGMService)
 
@@ -569,6 +575,8 @@ class PetScreenActivity : AppCompatActivity() {
             isBreakRunning = false
 
             initiatedPause = 1
+
+            changeUITimerTextColor("#9E9AA8")
 
             // ----- Change text to resume
             petScreenBinding.timerBtn1.text = resources.getString(R.string.resume)
@@ -609,7 +617,7 @@ class PetScreenActivity : AppCompatActivity() {
                 }
 
                 changeTimerToEditText()
-                changeUIBreakToTimer()
+                changeUIColorBreakToTimer()
 
                 // ----- Disable start button and enable cancel button
                 petScreenBinding.timerBtn0.isEnabled = false
@@ -912,7 +920,7 @@ class PetScreenActivity : AppCompatActivity() {
 
                 val styledDialogMessage1 = HtmlCompat.fromHtml(dialogMessage1, HtmlCompat.FROM_HTML_MODE_LEGACY)
                 newDialog1.setMessage(styledDialogMessage1)
-                newDialog1.setPositiveButton(android.R.string.ok){dialog, which -> }
+                newDialog1.setPositiveButton(android.R.string.ok){dialog, which -> hideSystemBars()}
                 newDialog1.show()
 
 
@@ -937,12 +945,13 @@ class PetScreenActivity : AppCompatActivity() {
 
                 val styledDialogMessage2 = HtmlCompat.fromHtml(dialogMessage2, HtmlCompat.FROM_HTML_MODE_LEGACY)
                 newDialog2.setMessage(styledDialogMessage2)
-                newDialog2.setPositiveButton(android.R.string.ok){dialog, which -> }
+                newDialog2.setPositiveButton(android.R.string.ok){dialog, which -> hideSystemBars()}
                 newDialog2.show()
             }
 
             builder.setPositiveButton(android.R.string.ok) { dialog, which ->
                 //Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
+                hideSystemBars()
             }
             builder.show()
 
