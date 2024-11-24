@@ -4,14 +4,15 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.AnimationDrawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.Looper
+import android.text.InputFilter
 import android.text.InputType
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View.TEXT_ALIGNMENT_CENTER
-import android.view.animation.Animation
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -22,10 +23,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.marginTop
-import androidx.core.view.setMargins
+import androidx.core.view.marginStart
 import androidx.core.view.setPadding
 import com.example.pomopet.databinding.ActivityNewEggBinding
+
 
 class NewEggActivity : AppCompatActivity() {
 
@@ -105,15 +106,20 @@ class NewEggActivity : AppCompatActivity() {
         petNameEditText.inputType = InputType.TYPE_CLASS_TEXT
         petNameEditText.textSize = 24f
         petNameEditText.textAlignment = TEXT_ALIGNMENT_CENTER
+        petNameEditText.filters += InputFilter.LengthFilter(12)
         return petNameEditText
     }
     private fun instantiatePetNameSubmitButton(): Button{
         val petNameSubmitButton = Button(this)
+        val shape = GradientDrawable()
+        shape.cornerRadius = 100f
+        shape.setColor(Color.parseColor("#664FA3"))
+        petNameSubmitButton.background = shape
         petNameSubmitButton.gravity = Gravity.CENTER
         petNameSubmitButton.text = resources.getText(R.string.submit)
-        petNameSubmitButton.textSize = 20f
+        petNameSubmitButton.transformationMethod = null
+        petNameSubmitButton.textSize = 16f
         petNameSubmitButton.setTextColor(Color.parseColor("#FFFFFF"))
-        petNameSubmitButton.setBackgroundColor(Color.parseColor("#664FA3"))
         petNameSubmitButton.setTypeface(null, Typeface.BOLD)
         val linearLayoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
