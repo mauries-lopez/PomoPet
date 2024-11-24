@@ -12,8 +12,9 @@ import android.text.InputFilter
 import android.text.InputType
 import android.util.Log
 import android.view.Gravity
-import android.view.View
+import android.view.LayoutInflater
 import android.view.View.TEXT_ALIGNMENT_CENTER
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -30,7 +31,6 @@ import com.example.pomopet.SettingsActivity.Companion.FILE_SETTINGS
 import com.example.pomopet.SettingsActivity.Companion.POMODOROS_SETTINGS
 import com.example.pomopet.SettingsActivity.Companion.POMO_BREAK_DURATION_SETTINGS
 import com.example.pomopet.databinding.ActivityPetScreenBinding
-import com.example.pomopet.databinding.ActivitySettingsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -885,19 +885,43 @@ class PetScreenActivity : AppCompatActivity() {
 
         // ----- Pet Help Button
         petScreenBinding.helpBtn.setOnClickListener{
+
+            val inflater = LayoutInflater.from(this)
+            val viewInitialized = inflater.inflate(R.layout.builder_pomopet_help, null)
+
             val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
             builder.setTitle("PomoPet Help")
+            builder.setView(viewInitialized)
 
-            val helpMessage = "This game calculates experience points (EXP) for your pet based on time spent during activities such as Pomodoro sessions. Here's how it works:<br><br>" +
-                    "<b>Maximum Experience per Level</b><br>" +
-                    "Level 1: 1,000 EXP<br>" +
-                    "Level 2: 2,000 EXP<br>" +
-                    "Level 3: 3,000 EXP<br>" +
-                    "Level 4: 4,000 EXP<br>" +
-                    "Level N: N * 1000 EXP (i.e., the maximum EXP for a given level is the level number multiplied by 1,000).<br><br><br>" +
-                    "<b>Evolutions</b><br>" +
-                    "Level 10: 1st Evolution<br>" +
-                    "Level 20: 2nd Evolution<br><br>" +
+            val btn_help_evolution = viewInitialized.findViewById<Button>(R.id.btn_help_evolution)
+            val btn_help_expcalcu = viewInitialized.findViewById<Button>(R.id.btn_help_expcalcu)
+
+            btn_help_evolution.setOnClickListener{
+                val newDialog1 = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+                newDialog1.setTitle("Evolution Help")
+                val dialogMessage1 = "This game calculates experience points (EXP) for your pet based on time spent during activities such as Pomodoro sessions. Here's how it works:<br><br>" +
+                "<b>Maximum Experience per Level</b><br>" +
+                        "Level 1: 1,000 EXP<br>" +
+                        "Level 2: 2,000 EXP<br>" +
+                        "Level 3: 3,000 EXP<br>" +
+                        "Level 4: 4,000 EXP<br>" +
+                        "Level N: N * 1000 EXP (i.e., the maximum EXP for a given level is the level number multiplied by 1,000).<br><br>" +
+                        "<b>Evolutions</b><br>" +
+                        "Level 10: 1st Evolution<br>" +
+                        "Level 20: 2nd Evolution"
+
+                val styledDialogMessage1 = HtmlCompat.fromHtml(dialogMessage1, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                newDialog1.setMessage(styledDialogMessage1)
+                newDialog1.setPositiveButton(android.R.string.ok){dialog, which -> }
+                newDialog1.show()
+
+
+            }
+
+            btn_help_expcalcu.setOnClickListener{
+                val newDialog2 = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+                newDialog2.setTitle("EXP Calculation")
+                val dialogMessage2 =
                     "<b>Experience Computation</b><br>" +
                     "Per second: You earn 0.5 EXP for each second of activity.<br><br>" +
                     "<b>Example Calculation</b><br>" +
@@ -910,16 +934,20 @@ class PetScreenActivity : AppCompatActivity() {
                     "[3] If the time is given in seconds, the system will compute EXP based on the exact number of seconds.<br><br>" +
                     "You can use this system to track your pet's progress, level it up, and unlock evolutions!"
 
-            val styledMessage = HtmlCompat.fromHtml(helpMessage, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
-            builder.setMessage(styledMessage)
-
+                val styledDialogMessage2 = HtmlCompat.fromHtml(dialogMessage2, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                newDialog2.setMessage(styledDialogMessage2)
+                newDialog2.setPositiveButton(android.R.string.ok){dialog, which -> }
+                newDialog2.show()
+            }
 
             builder.setPositiveButton(android.R.string.ok) { dialog, which ->
                 //Toast.makeText(applicationContext, android.R.string.ok, Toast.LENGTH_SHORT).show()
-                hideSystemBars()
             }
             builder.show()
+
+
+
         }
 
         // Inventory screen
