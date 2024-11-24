@@ -825,8 +825,8 @@ class PetScreenActivity : AppCompatActivity() {
     {
         val sharedPreferences = getSharedPreferences(FILE_SETTINGS, MODE_PRIVATE)
 
-        settingsPomodoro = SettingsActivity.pomodoro_set_array[sharedPreferences.getInt(POMODOROS_SETTINGS, 0)]
-        settingsBreakDuration = SettingsActivity.break_duration_array[sharedPreferences.getInt(POMO_BREAK_DURATION_SETTINGS, 2)]
+        settingsPomodoro = SettingsActivity.pomodoro_set_array[sharedPreferences.getInt(POMODOROS_SETTINGS, 2)]
+        settingsBreakDuration = SettingsActivity.break_duration_array[sharedPreferences.getInt(POMO_BREAK_DURATION_SETTINGS, 0)]
 
     }
 

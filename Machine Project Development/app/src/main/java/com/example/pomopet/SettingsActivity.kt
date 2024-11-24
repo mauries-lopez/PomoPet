@@ -43,8 +43,8 @@ class SettingsActivity : AppCompatActivity() {
         val settingsBinding: ActivitySettingsBinding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(settingsBinding.root)
 
-        currentPomodoroIndex = sharedPreferences.getInt(POMODOROS_SETTINGS, 0)
-        currentBreakIndex = sharedPreferences.getInt(POMO_BREAK_DURATION_SETTINGS, 2)
+        currentPomodoroIndex = sharedPreferences.getInt(POMODOROS_SETTINGS, 2)
+        currentBreakIndex = sharedPreferences.getInt(POMO_BREAK_DURATION_SETTINGS, 0)
 
         settingsBinding.txtPomodorosDuration.setText(pomodoro_set_array[currentPomodoroIndex].toString())
         settingsBinding.txtBreakMin.setText(break_duration_array[currentBreakIndex].toString())
