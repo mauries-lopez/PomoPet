@@ -3,10 +3,12 @@ package com.example.pomopet
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.pomopet.databinding.ActivitySettingsBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SettingsActivity : AppCompatActivity() {
     private var currentPomodoroIndex = -1
@@ -93,27 +95,43 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         settingsBinding.txtXBtn.setOnClickListener{
-            finish()
+            checkUnsavedSettings()
         }
 
         settingsBinding.btnResetSettings.setOnClickListener{
-            currentPomodoroIndex = 2
-            currentBreakIndex = 0
 
-            settingsBinding.txtPomodorosDuration.setText(pomodoro_set_array[currentPomodoroIndex].toString())
-            settingsBinding.txtBreakMin.setText(break_duration_array[currentBreakIndex].toString())
-            settingsBinding.sliderVolume.setValues(50f)
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+            builder.setTitle("Warning")
 
-            editor.putFloat(VOLUME_SETTINGS, 50f)
-            editor.putInt(POMODOROS_SETTINGS, currentPomodoroIndex)
-            editor.putInt(POMO_BREAK_DURATION_SETTINGS, currentBreakIndex)
-            editor.apply()
+            builder.setMessage("Reset settings?")
+                .setPositiveButton("Yes") { dialog, which ->
+                    hideSystemBars()
+                    dialog.dismiss()
 
-            val intentBGMService = Intent(this, BGMService::class.java)
-            intentBGMService.putExtra("SIGNAL_KEY", "volume")
-            startService(intentBGMService)
+                    currentPomodoroIndex = 2
+                    currentBreakIndex = 0
 
-            Toast.makeText(this, "Successfully reset settings! Pomodoro timer settings will apply on the next set of pomodoros.", Toast.LENGTH_SHORT).show()
+                    settingsBinding.txtPomodorosDuration.setText(pomodoro_set_array[currentPomodoroIndex].toString())
+                    settingsBinding.txtBreakMin.setText(break_duration_array[currentBreakIndex].toString())
+                    settingsBinding.sliderVolume.setValues(50f)
+
+                    editor.putFloat(VOLUME_SETTINGS, 50f)
+                    editor.putInt(POMODOROS_SETTINGS, currentPomodoroIndex)
+                    editor.putInt(POMO_BREAK_DURATION_SETTINGS, currentBreakIndex)
+                    editor.apply()
+
+                    val intentBGMService = Intent(this, BGMService::class.java)
+                    intentBGMService.putExtra("SIGNAL_KEY", "volume")
+                    startService(intentBGMService)
+
+                    Toast.makeText(this, "Successfully reset settings! Pomodoro timer settings will apply on the next set of pomodoros.", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("No") { dialog, which ->
+                    hideSystemBars()
+                    dialog.dismiss()
+                }
+            builder.show()
+
         }
 
         settingsBinding.btnSaveSettings.setOnClickListener{
@@ -126,11 +144,48 @@ class SettingsActivity : AppCompatActivity() {
             startService(intentBGMService)
             Toast.makeText(this, "Successfully saved settings! Pomodoro timer settings will apply on the next set of pomodoros.", Toast.LENGTH_SHORT).show()
         }
+
+        onBackPressedDispatcher.addCallback(this, object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                checkUnsavedSettings()
+            }
+        })
     }
 
     override fun onResume() {
         super.onResume()
         hideSystemBars()
     }
+
+    private fun checkUnsavedSettings()
+    {
+        val sharedPreferences = getSharedPreferences(FILE_SETTINGS, MODE_PRIVATE)
+
+        if (currentPomodoroIndex != sharedPreferences.getInt(POMODOROS_SETTINGS, 2) ||
+            currentBreakIndex != sharedPreferences.getInt(POMO_BREAK_DURATION_SETTINGS, 0) ||
+            volumeLevel != sharedPreferences.getFloat(VOLUME_SETTINGS, 50f))
+        {
+            val builder = MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogStyle)
+            builder.setTitle("Warning")
+
+            builder.setMessage("There are still unsaved changes! Discard changes?")
+                .setPositiveButton("Yes") { dialog, which ->
+                    hideSystemBars()
+                    dialog.dismiss()
+                    finish()
+                }
+                .setNegativeButton("No") { dialog, which ->
+                    hideSystemBars()
+                    dialog.dismiss()
+                }
+
+            builder.show()
+        }
+        else
+            finish()
+
+    }
+
+
 
 }
