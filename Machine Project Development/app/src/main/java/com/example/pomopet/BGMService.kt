@@ -73,7 +73,7 @@ class BGMService : Service() {
                     mediaPlayer!!.start()
 
                     val sharedPref = getSharedPreferences("FILE_SETTINGS", MODE_PRIVATE)
-                    var volumeLevel = sharedPref.getFloat("VOLUME_SETTINGS", 0F)
+                    var volumeLevel = sharedPref.getFloat("VOLUME_SETTINGS", 50F)
                     volumeLevel /= 100F
                     mediaPlayer!!.setVolume(volumeLevel, volumeLevel)
 
