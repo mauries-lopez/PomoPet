@@ -379,8 +379,10 @@ class PetScreenActivity : AppCompatActivity() {
             breakThreadStart(settingsBreakDuration * 60000L)
         }
         // else, end
-        else
+        else {
             changeTimerToEditText()
+            petScreenBinding.timerBtn0.isEnabled = false
+        }
 
 
     }
